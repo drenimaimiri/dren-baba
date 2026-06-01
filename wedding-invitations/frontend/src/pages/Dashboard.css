@@ -1,0 +1,168 @@
+.dashboard-page {
+  min-height: calc(100vh - 140px);
+  padding: 50px 0;
+}
+
+.dashboard-loading {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: var(--gray);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  color: var(--gold-dark);
+}
+
+.dashboard-header p {
+  color: var(--gray);
+}
+
+.dashboard-empty {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.dashboard-empty h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: var(--gold-dark);
+}
+
+.dashboard-empty p {
+  color: var(--gray);
+  margin-bottom: 30px;
+}
+
+.invitations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.invitation-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.invitation-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+.inv-card-header {
+  padding: 30px;
+  text-align: center;
+  position: relative;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.inv-card-names h3 {
+  font-size: 1.4rem;
+  color: var(--black);
+  margin: 5px 0;
+}
+
+.inv-card-ampersand {
+  font-family: 'Great Vibes', cursive;
+  font-size: 1.8rem;
+  color: var(--gold-dark);
+}
+
+.inv-card-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inv-card-status.published {
+  background: #4caf50;
+  color: white;
+}
+
+.inv-card-status.draft {
+  background: #ff9800;
+  color: white;
+}
+
+.inv-card-body {
+  padding: 20px;
+}
+
+.inv-card-date {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.inv-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  color: var(--gray);
+}
+
+.action-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-dark);
+  background: var(--cream);
+}
+
+.action-delete:hover {
+  border-color: #d32f2f;
+  color: #d32f2f;
+  background: #fff0f0;
+}
+
+@media (max-width: 768px) {
+  .invitations-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
