@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiUpload, FiMapPin, FiClock, FiHeart, FiSend } from 'react-icons/fi';
+import { FiUpload, FiClock, FiHeart, FiSend } from 'react-icons/fi';
 import { getTemplates, createInvitation } from '../api';
+import LocationPicker from '../components/LocationPicker';
+import '../components/LocationPicker.css';
 import './CreateInvitation.css';
 
 export default function CreateInvitation() {
@@ -29,11 +31,19 @@ export default function CreateInvitation() {
     photos: []
   });
   const [preview, setPreview] = useState([]);
+  const [error, setError] = useState('');
+
+  const goToStep = (nextStep) => {
+    setError('');
+    setStep(nextStep);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return navigate('/login');
-    getTemplates().then(res => setTemplates(res.data)).catch(() => {});
+    getTemplates()
+      .then(res => setTemplates(res.data))
+      .catch(() => setError('Templates nuk mund të ngarkoheshin. Kontrolloni lidhjen me serverin.'));
   }, []);
 
   const handleChange = (e) => {
@@ -54,6 +64,15 @@ export default function CreateInvitation() {
   const removePhoto = (index) => {
     setForm(prev => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }));
     setPreview(p => p.filter((_, i) => i !== index));
+  };
+
+  const handleLocationChange = (lat, lng, address) => {
+    setForm(prev => ({
+      ...prev,
+      locationLat: String(lat),
+      locationLng: String(lng),
+      location: address || prev.location,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -104,9 +123,11 @@ export default function CreateInvitation() {
           </div>
         </div>
 
+        {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           {step === 1 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
               <h2 className="step-title">Zgjidhni një Template</h2>
               <div className="template-select-grid">
                 {templates.map(t => (
@@ -135,7 +156,7 @@ export default function CreateInvitation() {
                 ))}
               </div>
               <div className="step-buttons">
-                <button type="button" className="btn btn-gold" onClick={() => setStep(2)} disabled={!form.templateId}>
+                <button type="button" className="btn btn-gold" onClick={() => goToStep(2)} disabled={!form.templateId}>
                   Vazhdo <FiHeart />
                 </button>
               </div>
@@ -143,7 +164,7 @@ export default function CreateInvitation() {
           )}
 
           {step === 2 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
               <h2 className="step-title">Detajet e Dasmës</h2>
               <div className="create-form">
                 <div className="form-row">
@@ -166,10 +187,6 @@ export default function CreateInvitation() {
                     <input type="time" name="weddingTime" value={form.weddingTime} onChange={handleChange} required />
                   </div>
                 </div>
-                <div className="form-group">
-                  <label><FiMapPin /> Lokacioni</label>
-                  <input type="text" name="location" value={form.location} onChange={handleChange} required placeholder="Emri i vendit dhe adresa" />
-                </div>
                 <div className="form-row">
                   <div className="form-group">
                     <label>Numri i Dhëndrit</label>
@@ -180,15 +197,16 @@ export default function CreateInvitation() {
                     <input type="tel" name="bridePhone" value={form.bridePhone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
                   </div>
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Latitude (për hartë)</label>
-                    <input type="number" step="any" name="locationLat" value={form.locationLat} onChange={handleChange} placeholder="p.sh. 41.3275" />
-                  </div>
-                  <div className="form-group">
-                    <label>Longitude (për hartë)</label>
-                    <input type="number" step="any" name="locationLng" value={form.locationLng} onChange={handleChange} placeholder="p.sh. 19.8187" />
-                  </div>
+
+                <LocationPicker
+                  lat={form.locationLat}
+                  lng={form.locationLng}
+                  onLocationChange={handleLocationChange}
+                />
+
+                <div className="form-group">
+                  <label>Adresa e Lokacionit</label>
+                  <input type="text" name="location" value={form.location} onChange={handleChange} required placeholder="Emri i vendit dhe adresa" />
                 </div>
                 <div className="form-group">
                   <label>Mesazhi Personal</label>
@@ -216,14 +234,14 @@ export default function CreateInvitation() {
                 </div>
               </div>
               <div className="step-buttons">
-                <button type="button" className="btn btn-outline" onClick={() => setStep(1)}>Prapa</button>
-                <button type="button" className="btn btn-gold" onClick={() => setStep(3)}>Vazhdo <FiHeart /></button>
+                <button type="button" className="btn btn-outline" onClick={() => goToStep(1)}>Prapa</button>
+                <button type="button" className="btn btn-gold" onClick={() => goToStep(3)}>Vazhdo <FiHeart /></button>
               </div>
             </motion.div>
           )}
 
           {step === 3 && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
               <h2 className="step-title">Personalizo Dizajnin</h2>
               <div className="design-customizer">
                 <div className="design-form">
@@ -270,7 +288,7 @@ export default function CreateInvitation() {
               </div>
 
               <div className="step-buttons">
-                <button type="button" className="btn btn-outline" onClick={() => setStep(2)}>Prapa</button>
+                <button type="button" className="btn btn-outline" onClick={() => goToStep(2)}>Prapa</button>
                 <button type="submit" className="btn btn-gold" disabled={loading}>
                   {loading ? 'Duke krijuar...' : <><FiSend /> Krijo Ftesën</>}
                 </button>

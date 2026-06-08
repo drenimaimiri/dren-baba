@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ftesë Dasme | &lt;Emrat e Çiftit&gt;</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    /* ===== VARIABLES ===== */
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #F9E7B3;
+      --gold-dark: #B8960F;
+      --gold-gradient: linear-gradient(135deg, #D4AF37, #F9E7B3, #D4AF37);
+      --bg-primary: #0d0a0a;
+      --bg-secondary: #1a1210;
+      --text-primary: #f5ede4;
+      --text-secondary: #c4b5a5;
+      --envelope-color: #f5e6d3;
+      --envelope-shade: #e8d5c0;
+      --envelope-shadow: #c4a88a;
+      --envelope-interior: #2a1f1a;
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(212, 175, 55, 0.2);
+      --font-heading: 'Playfair Display', serif;
+      --font-body: 'Cormorant Garamond', serif;
+      --font-script: 'Great Vibes', cursive;
+      --envelope-w: 320px;
+      --envelope-h: 220px;
+      --flap-h: 75px;
+    }
+
+    /* ===== RESET ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== BACKGROUND ===== */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .bg-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(60, 20, 20, 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(40, 10, 50, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 70%, rgba(80, 40, 20, 0.2) 0%, transparent 40%),
+        var(--bg-primary);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .bg-ornament {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ===== MUSIC BUTTON ===== */
+    #music-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      color: var(--gold-light);
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      transform: scale(0.8);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    #music-btn.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+    #music-btn:hover {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: rgba(212, 175, 55, 0.5);
+      transform: scale(1.1);
+    }
+    #music-btn.playing {
+      animation: music-pulse 2s ease-in-out infinite;
+    }
+    @keyframes music-pulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 0 rgba(212, 175, 55, 0.3); }
+      50% { box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 12px rgba(212, 175, 55, 0); }
+    }
+    .music-note {
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+    #music-btn.playing .music-note {
+      animation: note-bounce 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes note-bounce {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-3px) scale(1.1); }
+    }
+
+    /* ===== HERO / ENVELOPE SECTION ===== */
+    .hero-section {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: min-height 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hero-section.opened {
+      min-height: 50vh;
+    }
+
+    /* ===== ENVELOPE ===== */
+    .envelope-wrapper {
+      position: relative;
+      width: var(--envelope-w);
+      height: var(--envelope-h);
+      cursor: pointer;
+      perspective: 1200px;
+      transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease;
+    }
+    .envelope-wrapper:hover:not(.opened) {
+      transform: scale(1.03);
+    }
+    .envelope-wrapper:not(.opened) {
+      animation: envelope-float 3s ease-in-out infinite;
+    }
+    .envelope-wrapper.opened {
+      transform: scale(0.85);
+      cursor: default;
+      animation: none;
+    }
+    .envelope-wrapper.revealed {
+      transform: scale(0.7) translateY(20px);
+      opacity: 0.6;
+    }
+    @keyframes envelope-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+    }
+
+    /* -- Envelope Interior -- */
+    .envelope-interior {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: calc(var(--flap-h) + 10px);
+      background: linear-gradient(180deg, #1a1210, #2a1f1a);
+      border-radius: 4px 4px 0 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .envelope-interior::after {
+      content: '';
+      position: absolute;
+      top: 5px; left: 10%;
+      width: 80%; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
+    }
+
+    /* -- Envelope Shadow (below) -- */
+    .envelope-shadow {
+      position: absolute;
+      bottom: -20px; left: 5%;
+      width: 90%; height: 30px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%);
+      z-index: -1;
+      transition: all 0.8s ease;
+    }
+    .envelope-wrapper.opened .envelope-shadow {
+      opacity: 0.5;
+      transform: scaleX(0.8);
+    }
+
+    /* -- Envelope Body (Front) -- */
+    .envelope-body {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: calc(100% - var(--flap-h) + 2px);
+      background: linear-gradient(160deg, var(--envelope-color), var(--envelope-shade));
+      border-radius: 0 0 6px 6px;
+      border: 2px solid var(--gold);
+      border-top: none;
+      z-index: 3;
+      overflow: hidden;
+    }
+    .envelope-body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+    .envelope-body::after {
+      content: '';
+      position: absolute;
+      top: 15px; left: 50%;
+      transform: translateX(-50%);
+      width: 60px; height: 50px;
+      border: 1.5px solid rgba(212, 175, 55, 0.3);
+      border-radius: 3px;
+      opacity: 0.5;
+    }
+
+    /* Wax seal decoration */
+    .envelope-seal {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 45px; height: 45px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #c0392b, #8a1f1a);
+      border: 2px solid #6b1410;
+      z-index: 2;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.3),
+        inset 0 1px 2px rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-script);
+      font-size: 16px;
+      color: var(--gold-light);
+      opacity: 0.8;
+    }
+    .envelope-seal::after {
+      content: '♥';
+      font-size: 14px;
+      color: rgba(249, 231, 179, 0.6);
+    }
+    .envelope-body .envelope-seal {
+      top: 50%;
+    }
+
+    /* -- Envelope Flap -- */
+    .envelope-flap {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: var(--flap-h);
+      background: linear-gradient(160deg, var(--envelope-color), var(--envelope-shade));
+      clip-path: polygon(0 100%, 50% 0, 100% 100%);
+      z-index: 4;
+      transform-origin: 50% 100%;
+      transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+      border: none;
+      backface-visibility: hidden;
+    }
+    .envelope-flap::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, rgba(212, 175, 55, 0.06), transparent 50%);
+      clip-path: polygon(0 100%, 50% 0, 100% 100%);
+    }
+    .envelope-wrapper.opened .envelope-flap {
+      transform: rotateX(-180deg);
+    }
+
+    /* -- Envelope border wrapping (the gold border on sides) -- */
+    .envelope-border-l,
+    .envelope-border-r {
+      position: absolute;
+      top: 0;
+      width: 2px;
+      height: calc(100% - var(--flap-h) + 2px);
+      background: var(--gold);
+      z-index: 4;
+      opacity: 0;
+    }
+    .envelope-border-l { left: 0; bottom: 0; }
+    .envelope-border-r { right: 0; bottom: 0; }
+
+    /* -- Envelope shine -- */
+    .envelope-shine {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.03) 100%);
+      z-index: 5;
+      pointer-events: none;
+      border-radius: 6px;
+    }
+
+    /* ===== LETTER ===== */
+    .letter-container {
+      position: absolute;
+      top: 8px; left: 12px;
+      width: calc(100% - 24px);
+      height: calc(100% - 16px);
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      pointer-events: none;
+      transform: translateY(0);
+      transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .envelope-wrapper.opened .letter-container {
+      transform: translateY(-120px);
+    }
+    .envelope-wrapper.revealed .letter-container {
+      transform: translateY(-180px);
+      opacity: 0;
+    }
+
+    .letter-preview {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #fdf8f0, #f5ede0);
+      border-radius: 3px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+      transform: scale(0.97);
+      transition: all 0.6s ease;
+    }
+    .letter-preview::before {
+      content: '✦';
+      font-size: 12px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .letter-preview span {
+      font-family: var(--font-script);
+      font-size: 14px;
+      color: var(--gold-dark);
+      line-height: 1.2;
+    }
+    .envelope-wrapper.opened .letter-preview {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ===== CLICK HINT ===== */
+    .click-hint {
+      margin-top: 35px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--text-secondary);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      animation: hint-pulse 2s ease-in-out infinite;
+      transition: opacity 0.8s ease;
+      z-index: 2;
+    }
+    .click-hint.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    @keyframes hint-pulse {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50% { opacity: 0.9; transform: translateY(-4px); }
+    }
+
+    /* ===== INVITATION CONTENT ===== */
+    .invitation-section {
+      position: relative;
+      z-index: 2;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+      opacity: 0;
+      transform: translateY(60px);
+      transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+    .invitation-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .invitation-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 60px 50px;
+      text-align: center;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .invitation-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--gold-gradient);
+      opacity: 0.6;
+    }
+    .invitation-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--gold-gradient);
+      opacity: 0.3;
+    }
+
+    /* Gold corner ornaments */
+    .corner-ornament {
+      position: absolute;
+      width: 40px; height: 40px;
+      border-color: rgba(212, 175, 55, 0.3);
+      border-style: solid;
+    }
+    .corner-ornament.tl { top: 15px; left: 15px; border-width: 1px 0 0 1px; border-radius: 4px 0 0 0; }
+    .corner-ornament.tr { top: 15px; right: 15px; border-width: 1px 1px 0 0; border-radius: 0 4px 0 0; }
+    .corner-ornament.bl { bottom: 15px; left: 15px; border-width: 0 0 1px 1px; border-radius: 0 0 0 4px; }
+    .corner-ornament.br { bottom: 15px; right: 15px; border-width: 0 1px 1px 0; border-radius: 0 0 4px 0; }
+
+    /* Decorative divider */
+    .divider {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px auto;
+      position: relative;
+    }
+    .divider::after {
+      content: '✦';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold);
+      font-size: 10px;
+      background: transparent;
+      padding: 0 12px;
+    }
+    .divider.large {
+      width: 200px;
+      margin: 30px auto;
+    }
+
+    /* -- Couple Names -- */
+    .couple-names {
+      font-family: var(--font-script);
+      font-size: 52px;
+      color: var(--gold-light);
+      line-height: 1.2;
+      margin: 10px 0 5px;
+      text-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+    }
+    .couple-ampersand {
+      font-family: var(--font-heading);
+      font-size: 28px;
+      color: rgba(212, 175, 55, 0.5);
+      font-style: italic;
+      margin: 0 10px;
+      line-height: 1;
+    }
+    .invitation-subtitle {
+      font-family: var(--font-body);
+      font-size: 18px;
+      color: var(--text-secondary);
+      font-style: italic;
+      letter-spacing: 2px;
+      margin: 5px 0 15px;
+    }
+
+    /* -- Invitation Text -- */
+    .invitation-text {
+      font-family: var(--font-body);
+      font-size: 19px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      font-style: italic;
+      max-width: 500px;
+      margin: 10px auto;
+    }
+
+    /* -- Details -- */
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin: 35px 0;
+      text-align: center;
+    }
+    .detail-item {
+      padding: 20px 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      border-radius: 12px;
+      transition: all 0.4s ease;
+    }
+    .detail-item:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(212, 175, 55, 0.25);
+      transform: translateY(-3px);
+    }
+    .detail-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .detail-label {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 6px;
+    }
+    .detail-value {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .detail-value.location-name {
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    /* ===== MAPS BUTTON ===== */
+    .maps-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: transparent;
+      border: 1.5px solid rgba(212, 175, 55, 0.4);
+      border-radius: 50px;
+      color: var(--gold-light);
+      font-family: var(--font-body);
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      margin: 10px 0 20px;
+    }
+    .maps-btn:hover {
+      background: rgba(212, 175, 55, 0.1);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(212, 175, 55, 0.15);
+    }
+    .maps-btn svg {
+      width: 18px; height: 18px;
+      fill: currentColor;
+    }
+
+    /* ===== COUNTDOWN ===== */
+    .countdown-section {
+      margin: 40px 0 20px;
+      padding: 30px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 16px;
+      border: 1px solid rgba(212, 175, 55, 0.08);
+    }
+    .countdown-title {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+    }
+    .countdown-grid {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .countdown-item {
+      min-width: 80px;
+      padding: 14px 10px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    .countdown-number {
+      font-family: var(--font-heading);
+      font-size: 38px;
+      font-weight: 600;
+      color: var(--gold-light);
+      display: block;
+      line-height: 1.1;
+    }
+    .countdown-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ===== RSVP SECTION ===== */
+    .rsvp-section {
+      margin: 40px 0 20px;
+      padding: 35px 30px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(212, 175, 55, 0.12);
+      border-radius: 16px;
+      position: relative;
+    }
+    .rsvp-section::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 20%;
+      width: 60%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .rsvp-title {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+    .rsvp-subtitle {
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    .rsvp-phones {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .rsvp-phone-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-heading);
+      font-size: 18px;
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border: 1px solid rgba(212, 175, 55, 0.08);
+      border-radius: 8px;
+      min-width: 220px;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .rsvp-phone-item:hover {
+      border-color: rgba(212, 175, 55, 0.25);
+      background: rgba(255,255,255,0.03);
+    }
+    .rsvp-phone-item .phone-icon {
+      color: var(--gold);
+      font-size: 18px;
+    }
+
+    /* ===== FOOTER ===== */
+    .invitation-footer {
+      margin-top: 50px;
+      padding: 30px 0 10px;
+      border-top: 1px solid rgba(212, 175, 55, 0.1);
+    }
+    .footer-text {
+      font-family: var(--font-script);
+      font-size: 28px;
+      color: rgba(212, 175, 55, 0.4);
+      margin-bottom: 10px;
+    }
+    .footer-sub {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 2px;
+    }
+
+    /* ===== REVEALED STATE (Letter fully out) ===== */
+    .envelope-wrapper.revealed {
+      pointer-events: none;
+    }
+
+    /* ===== SCROLL REVEAL ANIMATIONS ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ===== LOADING / INITIAL ===== */
+    .initial-loader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9999;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.8s ease;
+    }
+    .initial-loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loader-ring {
+      width: 50px; height: 50px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      :root {
+        --envelope-w: 260px;
+        --envelope-h: 180px;
+        --flap-h: 60px;
+      }
+      .invitation-card {
+        padding: 40px 24px;
+        border-radius: 16px;
+      }
+      .couple-names {
+        font-size: 38px;
+      }
+      .couple-ampersand {
+        font-size: 22px;
+      }
+      .details-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .countdown-item {
+        min-width: 65px;
+        padding: 10px 8px;
+      }
+      .countdown-number {
+        font-size: 28px;
+      }
+      .rsvp-section {
+        padding: 25px 18px;
+      }
+      #music-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+      .invitation-section {
+        padding: 0 16px 80px;
+      }
+      .envelope-seal {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+      }
+      .envelope-seal::after {
+        font-size: 11px;
+      }
+      .click-hint {
+        font-size: 13px;
+        letter-spacing: 2px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      :root {
+        --envelope-w: 220px;
+        --envelope-h: 155px;
+        --flap-h: 50px;
+      }
+      .couple-names {
+        font-size: 30px;
+      }
+      .invitation-card {
+        padding: 30px 16px;
+      }
+      .detail-item {
+        padding: 14px 12px;
+      }
+      .maps-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      :root {
+        --envelope-w: 360px;
+        --envelope-h: 250px;
+        --flap-h: 85px;
+      }
+    }
+
+    /* ===== UTILITY ===== */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    /* Glow line under invitation card */
+    .glow-line {
+      width: 50px;
+      height: 2px;
+      background: var(--gold);
+      margin: 15px auto;
+      border-radius: 2px;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== INITIAL LOADER ===== -->
+  <div class="initial-loader" id="initialLoader">
+    <div class="loader-ring"></div>
+  </div>
+
+  <!-- ===== BACKGROUND CANVAS ===== -->
+  <canvas id="bg-canvas"></canvas>
+  <div class="bg-overlay"></div>
+  <div class="bg-ornament"></div>
+
+  <!-- ===== MUSIC BUTTON ===== -->
+  <button id="music-btn" aria-label="Ndale/Vazhdo muzikën" title="Ndale/Vazhdo muzikën">
+    <span class="music-note">♫</span>
+  </button>
+
+  <!-- ===== HERO SECTION (Envelope) ===== -->
+  <section class="hero-section" id="heroSection">
+    <div class="envelope-wrapper" id="envelopeWrapper">
+      <div class="envelope" id="envelope">
+        <div class="envelope-interior"></div>
+        <div class="letter-container" id="letterContainer">
+          <div class="letter-preview">
+            <span>Ju presim me dashuri</span>
+          </div>
+        </div>
+        <div class="envelope-body">
+          <div class="envelope-seal"></div>
+        </div>
+        <div class="envelope-flap" id="envelopeFlap"></div>
+        <div class="envelope-border-l"></div>
+        <div class="envelope-border-r"></div>
+        <div class="envelope-shine"></div>
+      </div>
+      <div class="envelope-shadow"></div>
+    </div>
+    <p class="click-hint" id="clickHint">Prek zarfin për ta hapur</p>
+  </section>
+
+  <!-- ===== INVITATION SECTION ===== -->
+  <section class="invitation-section" id="invitationSection">
+    <div class="invitation-card">
+      <div class="corner-ornament tl"></div>
+      <div class="corner-ornament tr"></div>
+      <div class="corner-ornament bl"></div>
+      <div class="corner-ornament br"></div>
+
+      <div class="reveal">
+        <p class="invitation-subtitle">Bashkohuni me ne në celebrimin e dashurisë</p>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <div class="glow-line"></div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <h1 class="couple-names">
+          Arbër &amp; Aurora
+        </h1>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <p class="invitation-text">
+          "Dashuria nuk qeveriset nga vullneti, as nuk mund të negociohet. Ajo vjen si bleta në pranverë, pa pyetur, pa paralajmëruar."
+        </p>
+      </div>
+
+      <div class="divider large reveal reveal-delay-2"></div>
+
+      <div class="reveal reveal-delay-2">
+        <p class="invitation-text" style="font-style: normal;">
+          Me gëzim të madh ju ftojmë të jeni pjesë e ditës sonë më të veçantë.
+          Prania juaj do të na mbushë me lumturi dhe do ta bëjë këtë ditë edhe më të paharrueshme.
+        </p>
+      </div>
+
+      <div class="divider reveal reveal-delay-3"></div>
+
+      <div class="details-grid reveal reveal-delay-3">
+        <div class="detail-item">
+          <span class="detail-icon">📅</span>
+          <div class="detail-label">Data</div>
+          <div class="detail-value">15 Gusht 2026</div>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">⏰</span>
+          <div class="detail-label">Ora</div>
+          <div class="detail-value">16:00</div>
+        </div>
+        <div class="detail-item">
+          <span class="detail-icon">📍</span>
+          <div class="detail-label">Lokacioni</div>
+          <div class="detail-value location-name">Kisha e Shën Pjetrit<br>Tiranë, Shqipëri</div>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-3">
+        <button class="maps-btn" id="mapsBtn" aria-label="Hap në Google Maps">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          Hap në Google Maps
+        </button>
+      </div>
+
+      <div class="countdown-section reveal reveal-delay-4">
+        <div class="countdown-title">⏳ Mbesin</div>
+        <div class="countdown-grid" id="countdownGrid">
+          <div class="countdown-item">
+            <span class="countdown-number" id="countDays">00</span>
+            <span class="countdown-label">Ditë</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="countHours">00</span>
+            <span class="countdown-label">Orë</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="countMinutes">00</span>
+            <span class="countdown-label">Minuta</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="countSeconds">00</span>
+            <span class="countdown-label">Sekonda</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rsvp-section reveal reveal-delay-4">
+        <h2 class="rsvp-title">Konfirmoni Ardhjen Tuaj</h2>
+        <p class="rsvp-subtitle">Na njoftoni për pjesëmarrjen tuaj</p>
+        <div class="rsvp-phones">
+          <div class="rsvp-phone-item">
+            <span class="phone-icon">📞</span>
+            +355 67 123 4567
+          </div>
+          <div class="rsvp-phone-item">
+            <span class="phone-icon">📞</span>
+            +355 68 765 4321
+          </div>
+        </div>
+      </div>
+
+      <div class="invitation-footer reveal">
+        <p class="footer-text">Me dashuri</p>
+        <p class="footer-sub">Arbër &amp; Aurora ❀ 15.08.2026</p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ==========================================================
+       KONFIGURIMI - Ndryshoni vlerat sipas të dhënave tuaja
+       ========================================================== */
+
+    /** URL e muzikës në sfond (mp3 ose ndonjë format audio) */
+    const MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+
+    /** Data e dasmës për countdown */
+    const WEDDING_DATE = new Date('2026-08-15T16:00:00');
+
+    /** Emrat e çiftit (për titull) */
+    const COUPLE_NAMES = { groom: 'Arbër', bride: 'Aurora' };
+
+    /* ==========================================================
+       INICIALIZIMI
+       ========================================================== */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fshehim loader-in
+      setTimeout(() => {
+        document.getElementById('initialLoader').classList.add('hidden');
+      }, 800);
+
+      initEnvelope();
+      initParticles();
+      initCountdown();
+      initScrollReveal();
+      initMapsButton();
+    });
+
+    /* ==========================================================
+       HAPJA E ZARFIT (3D Animation)
+       ========================================================== */
+
+    function initEnvelope() {
+      const wrapper = document.getElementById('envelopeWrapper');
+      const hint = document.getElementById('clickHint');
+      const hero = document.getElementById('heroSection');
+      const invitation = document.getElementById('invitationSection');
+      const musicBtn = document.getElementById('music-btn');
+      let isOpening = false;
+      let hasOpened = false;
+      let audioCtx = null;
+      let audioElement = null;
+      let isMusicPlaying = false;
+
+      wrapper.addEventListener('click', () => {
+        if (isOpening || hasOpened) return;
+        isOpening = true;
+
+        // Fshehim hint-in
+        hint.classList.add('hidden');
+
+        // Fillojmë muzikën
+        startMusic();
+
+        // HAPJA E ZARFIT
+        wrapper.classList.add('opened');
+
+        // Pas 1.2s (kur zarfi është hapur) shfaqim përmbajtjen
+        setTimeout(() => {
+          wrapper.classList.add('revealed');
+          hero.classList.add('opened');
+
+          // Shfaqim përmbajtjen e ftesës
+          invitation.classList.add('visible');
+
+          // Shfaqim butonin e muzikës
+          musicBtn.classList.add('visible');
+          if (isMusicPlaying) musicBtn.classList.add('playing');
+
+          hasOpened = true;
+          isOpening = false;
+        }, 1400);
+      });
+
+      /* ---- Muzika ---- */
+      function startMusic() {
+        if (audioCtx) return; // tashmë ka filluar
+
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          audioElement = new Audio(MUSIC_URL);
+          audioElement.loop = true;
+          audioElement.volume = 0.4;
+
+          const source = audioCtx.createMediaElementSource(audioElement);
+          const gainNode = audioCtx.createGain();
+          gainNode.gain.value = 0.4;
+          source.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+
+          audioElement.play().then(() => {
+            isMusicPlaying = true;
+            musicBtn.classList.add('playing');
+          }).catch(() => {
+            // Nëse shfletuesi bllokon autoplay-in, prapë tregojmë butonin
+            isMusicPlaying = false;
+          });
+        } catch (e) {
+          // Fallback: përdorim Audio pa Web Audio API
+          try {
+            audioElement = new Audio(MUSIC_URL);
+            audioElement.loop = true;
+            audioElement.volume = 0.4;
+            audioElement.play().then(() => {
+              isMusicPlaying = true;
+            }).catch(() => {});
+          } catch (e2) {}
+        }
+      }
+
+      // Kontrolli i muzikës
+      musicBtn.addEventListener('click', () => {
+        if (!audioElement) return;
+        if (isMusicPlaying) {
+          audioElement.pause();
+          isMusicPlaying = false;
+          musicBtn.classList.remove('playing');
+        } else {
+          audioElement.play().then(() => {
+            isMusicPlaying = true;
+            musicBtn.classList.add('playing');
+          }).catch(() => {});
+        }
+      });
+    }
+
+    /* ==========================================================
+       GRIMCAT (PARTICLES) - Canvas
+       ========================================================== */
+
+    function initParticles() {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animId;
+      let w, h;
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const COUNT = 80;
+
+      function createParticle() {
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: Math.random() * 2.5 + 0.5,
+          speedX: (Math.random() - 0.5) * 0.15,
+          speedY: -(Math.random() * 0.2 + 0.05),
+          opacity: Math.random() * 0.5 + 0.1,
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: Math.random() * 0.02 + 0.005,
+          gold: Math.random() > 0.6, // disa janë më të arta
+        };
+      }
+
+      for (let i = 0; i < COUNT; i++) {
+        particles.push(createParticle());
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+
+        for (const p of particles) {
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.pulse += p.pulseSpeed;
+
+          // Riciklimi
+          if (p.y < -10) {
+            p.y = h + 10;
+            p.x = Math.random() * w;
+          }
+          if (p.x < -10) p.x = w + 10;
+          if (p.x > w + 10) p.x = -10;
+
+          const alpha = p.opacity * (0.6 + 0.4 * Math.sin(p.pulse));
+          ctx.beginPath();
+          if (p.gold) {
+            ctx.fillStyle = `rgba(212, 175, 55, ${alpha})`;
+            ctx.shadowColor = 'rgba(212, 175, 55, 0.3)';
+            ctx.shadowBlur = 8;
+          } else {
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.6})`;
+            ctx.shadowBlur = 0;
+          }
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+
+        animId = requestAnimationFrame(draw);
+      }
+      draw();
+    }
+
+    /* ==========================================================
+       COUNTDOWN
+       ========================================================== */
+
+    function initCountdown() {
+      const daysEl = document.getElementById('countDays');
+      const hoursEl = document.getElementById('countHours');
+      const minsEl = document.getElementById('countMinutes');
+      const secsEl = document.getElementById('countSeconds');
+
+      function update() {
+        const now = new Date();
+        const diff = Math.max(0, WEDDING_DATE - now);
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        daysEl.textContent = String(days).padStart(2, '0');
+        hoursEl.textContent = String(hours).padStart(2, '0');
+        minsEl.textContent = String(minutes).padStart(2, '0');
+        secsEl.textContent = String(seconds).padStart(2, '0');
+      }
+      update();
+      setInterval(update, 1000);
+    }
+
+    /* ==========================================================
+       SCROLL REVEAL (Intersection Observer)
+       ========================================================== */
+
+    function initScrollReveal() {
+      const els = document.querySelectorAll('.reveal');
+      if (!els.length) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            // Nuk e vëzhgojmë më pasi u shfaq
+            observer.unobserve(entry.target);
+          }
+        }
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px',
+      });
+
+      for (const el of els) {
+        observer.observe(el);
+      }
+    }
+
+    /* ==========================================================
+       BUTONI I GOOGLE MAPS
+       ========================================================== */
+
+    function initMapsButton() {
+      const btn = document.getElementById('mapsBtn');
+      const location = encodeURIComponent('Kisha e Shën Pjetrit, Tiranë, Shqipëri');
+      btn.addEventListener('click', () => {
+        window.open(`https://www.google.com/maps/search/${location}`, '_blank');
+      });
+    }
+  </script>
+</body>
+</html>
