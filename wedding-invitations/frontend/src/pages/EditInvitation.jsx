@@ -11,7 +11,7 @@ export default function EditInvitation() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    groomName: '', brideName: '', groomPhone: '', bridePhone: '',
+    groomName: '', brideName: '', phone: '',
     weddingDate: '', weddingTime: '',
     location: '', locationLat: '', locationLng: '', personalMessage: '',
     customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7', customFont: 'Georgia',
@@ -36,8 +36,7 @@ export default function EditInvitation() {
       setForm({
         groomName: inv.groomName,
         brideName: inv.brideName,
-        groomPhone: inv.groomPhone || '',
-        bridePhone: inv.bridePhone || '',
+        phone: inv.groomPhone || '',
         weddingDate: inv.weddingDate?.split('T')[0] || '',
         weddingTime: inv.weddingTime,
         location: inv.location,
@@ -78,6 +77,8 @@ export default function EditInvitation() {
       Object.keys(form).forEach(key => {
         if (key === 'photos') {
           form.photos.forEach(photo => fd.append('photos', photo));
+        } else if (key === 'phone') {
+          fd.append('groomPhone', form[key]);
         } else {
           fd.append(key, form[key]);
         }
@@ -139,15 +140,9 @@ export default function EditInvitation() {
                 <label>Lokacioni</label>
                 <input type="text" name="location" value={form.location} onChange={handleChange} required />
               </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Numri i Dhëndrit</label>
-                  <input type="tel" name="groomPhone" value={form.groomPhone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
-                </div>
-                <div className="form-group">
-                  <label>Numri i Nuses</label>
-                  <input type="tel" name="bridePhone" value={form.bridePhone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
-                </div>
+              <div className="form-group">
+                <label>Numri i Telefonit për Konfirmim</label>
+                <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
               </div>
               <div className="form-row">
                 <div className="form-group">

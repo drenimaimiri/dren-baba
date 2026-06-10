@@ -72,15 +72,34 @@ export default function InvitationView() {
               transition={{ duration: 0.6 }}
             >
               <div className={`envelope ${envelopeOpen ? 'open' : ''}`}>
-                <div className="envelope-back" />
-                <div className="envelope-flap-top" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }} />
-                <div className="envelope-flap-bottom" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }} />
-                <div className="envelope-body" style={{ background: `linear-gradient(135deg, ${inv.customSecondaryColor || '#FFF8E7'}, white)` }}>
-                  <div className="envelope-seal" style={{ borderColor: primaryColor }}>
-                    <FiHeart style={{ color: primaryColor }} />
+                <div className="envelope-shadow" />
+                <div className="envelope-flap" style={{ background: `linear-gradient(135deg, ${primaryColor}dd, ${primaryColor}aa)` }}>
+                  <div className="envelope-flap-heart">
+                    <FiHeart />
                   </div>
                 </div>
-                <div className="envelope-shadow" />
+                <div className="envelope-body" style={{ background: `linear-gradient(165deg, ${inv.customSecondaryColor || '#FFF8E7'}, ${inv.customSecondaryColor || '#FFF5E0'})` }}>
+                  <div className="envelope-body-border" />
+                  <div className="envelope-seal" style={{ borderColor: primaryColor }}>
+                    <div className="seal-wax" style={{ background: `radial-gradient(circle at 35% 35%, ${primaryColor}ee, ${primaryColor}cc, ${primaryColor})` }}>
+                      <FiHeart style={{ color: '#5a3e1b', fontSize: '1.4rem' }} />
+                    </div>
+                  </div>
+                </div>
+                <div className="envelope-interior" />
+                <div className="envelope-card">
+                  <div className="env-card-inner" style={{ borderColor: `${primaryColor}44` }}>
+                    <div className="env-card-heart" style={{ color: primaryColor }}>✦</div>
+                    <div className="env-card-names">
+                      {inv.groomName}
+                      <span className="env-card-ampersand" style={{ color: primaryColor }}>&</span>
+                      {inv.brideName}
+                    </div>
+                    <div className="env-card-line" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}, transparent)` }} />
+                    <div className="env-card-text">Bashkohuni me ne në këtë ditë të veçantë</div>
+                    <div className="env-card-date">{weddingDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                  </div>
+                </div>
               </div>
               {!envelopeOpen && (
                 <motion.button
@@ -282,28 +301,19 @@ export default function InvitationView() {
                     >
                       <h2 className="inv-section-title">Konfirmoni Ardhjen Tuaj</h2>
                       <p className="inv-section-subtitle">
-                        Ju lutemi na njoftoni për pjesëmarrjen tuaj duke na kontaktuar në një nga numrat më poshtë.
+                        Ju lutemi na njoftoni për pjesëmarrjen tuaj duke na kontaktuar në numrin më poshtë.
                       </p>
 
-                      <div className="contact-cards">
-                        {inv.groomPhone && (
-                          <div className="contact-card" style={{ borderColor: primaryColor + '30' }}>
-                            <div className="contact-card-header">
-                              <div className="contact-avatar" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }}>
-                                {inv.groomName.charAt(0)}
-                              </div>
-                              <div>
-                                <h4>{inv.groomName}</h4>
-                                <p>Dhëndri</p>
-                              </div>
-                            </div>
-                            <p className="contact-phone">{inv.groomPhone}</p>
-                            <div className="contact-actions">
-                              <a href={`tel:${inv.groomPhone}`} className="contact-btn call-btn" style={{ borderColor: primaryColor, color: primaryColor }}>
+                      <div className="contact-single">
+                        <div className="contact-card" style={{ borderColor: primaryColor + '30' }}>
+                          <div className="contact-actions" style={{ flexDirection: 'column', gap: 15 }}>
+                            <p className="contact-phone-single">{inv.groomPhone || inv.bridePhone}</p>
+                            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                              <a href={`tel:${inv.groomPhone || inv.bridePhone}`} className="contact-btn call-btn" style={{ borderColor: primaryColor, color: primaryColor }}>
                                 <FiPhone /> Telefono
                               </a>
                               <a
-                                href={`https://wa.me/${inv.groomPhone.replace(/[^0-9]/g, '')}`}
+                                href={`https://wa.me/${(inv.groomPhone || inv.bridePhone).replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="contact-btn whatsapp-btn"
@@ -313,36 +323,7 @@ export default function InvitationView() {
                               </a>
                             </div>
                           </div>
-                        )}
-
-                        {inv.bridePhone && (
-                          <div className="contact-card" style={{ borderColor: primaryColor + '30' }}>
-                            <div className="contact-card-header">
-                              <div className="contact-avatar" style={{ background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)` }}>
-                                {inv.brideName.charAt(0)}
-                              </div>
-                              <div>
-                                <h4>{inv.brideName}</h4>
-                                <p>Nusja</p>
-                              </div>
-                            </div>
-                            <p className="contact-phone">{inv.bridePhone}</p>
-                            <div className="contact-actions">
-                              <a href={`tel:${inv.bridePhone}`} className="contact-btn call-btn" style={{ borderColor: primaryColor, color: primaryColor }}>
-                                <FiPhone /> Telefono
-                              </a>
-                              <a
-                                href={`https://wa.me/${inv.bridePhone.replace(/[^0-9]/g, '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="contact-btn whatsapp-btn"
-                                style={{ background: '#25D366', color: 'white' }}
-                              >
-                                <FiMessageSquare /> WhatsApp
-                              </a>
-                            </div>
-                          </div>
-                        )}
+                        </div>
                       </div>
                     </motion.div>
                   </div>

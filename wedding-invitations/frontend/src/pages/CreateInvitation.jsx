@@ -17,8 +17,7 @@ export default function CreateInvitation() {
     templateId: searchParams.get('template') || '',
     groomName: '',
     brideName: '',
-    groomPhone: '',
-    bridePhone: '',
+    phone: '',
     weddingDate: '',
     weddingTime: '',
     location: '',
@@ -83,6 +82,8 @@ export default function CreateInvitation() {
       Object.keys(form).forEach(key => {
         if (key === 'photos') {
           form.photos.forEach(photo => fd.append('photos', photo));
+        } else if (key === 'phone') {
+          fd.append('groomPhone', form[key]);
         } else {
           fd.append(key, form[key]);
         }
@@ -187,15 +188,9 @@ export default function CreateInvitation() {
                     <input type="time" name="weddingTime" value={form.weddingTime} onChange={handleChange} required />
                   </div>
                 </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Numri i Dhëndrit</label>
-                    <input type="tel" name="groomPhone" value={form.groomPhone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
-                  </div>
-                  <div className="form-group">
-                    <label>Numri i Nuses</label>
-                    <input type="tel" name="bridePhone" value={form.bridePhone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
-                  </div>
+                <div className="form-group">
+                  <label>Numri i Telefonit për Konfirmim</label>
+                  <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
                 </div>
 
                 <LocationPicker

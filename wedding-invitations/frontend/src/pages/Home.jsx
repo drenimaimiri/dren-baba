@@ -72,7 +72,7 @@ export default function Home() {
             {[
               { icon: <FiStar />, title: 'Template Elegante', desc: 'Dizajne profesionale dhe moderne për çdo stil dasme' },
               { icon: <FiCamera />, title: 'Galeria Fotove', desc: 'Shtoni fotot tuaja më të bukura në ftesë' },
-              { icon: <FiMapPin />, title: 'Harta & Lokacioni', desc: 'Vendosni lokacionin me hartë të integruar' },
+              { icon: <FiMapPin />, title: 'Lokacioni', desc: 'Vendosni lokacionin e dasmës' },
               { icon: <FiClock />, title: 'Countdown', desc: 'Numërimi mbrapsht automatik deri në ditën e madhe' }
             ].map((f, i) => (
               <motion.div

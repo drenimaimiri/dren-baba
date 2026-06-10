@@ -1,94 +1,45 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { FiMapPin } from 'react-icons/fi';
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
-
-function LocationMarker({ position, onPositionChange }) {
-  useMapEvents({
-    click(e) {
-      onPositionChange(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return position ? <Marker draggable position={position} eventHandlers={{ dragend: (e) => { const m = e.target.getLatLng(); onPositionChange(m.lat, m.lng); } }} /> : null;
-}
-
-function MapCenterUpdater({ lat, lng }) {
-  const map = useMap();
-  const prev = useRef([lat, lng]);
-  useEffect(() => {
-    if (prev.current[0] !== lat || prev.current[1] !== lng) {
-      prev.current = [lat, lng];
-      map.setView([lat, lng], map.getZoom());
-    }
-  }, [lat, lng, map]);
-  return null;
-}
-
 export default function LocationPicker({ lat, lng, onLocationChange }) {
-  const onChangeRef = useRef(onLocationChange);
-  onChangeRef.current = onLocationChange;
+  const safeLat = parseFloat(lat) || '';
+  const safeLng = parseFloat(lng) || '';
 
-  const [userPosition, setUserPosition] = useState(null);
-  const [resolved, setResolved] = useState(false);
+  const handleLatChange = (e) => {
+    const v = e.target.value;
+    onLocationChange(v, lng || '', '');
+  };
 
-  const safeLat = parseFloat(lat) || 0;
-  const safeLng = parseFloat(lng) || 0;
-  const hasInitialCoords = Boolean(lat && lng);
-
-  const center = userPosition || (hasInitialCoords ? [safeLat, safeLng] : [42.6026, 20.9030]);
-
-  useEffect(() => {
-    if (resolved) return;
-    if (hasInitialCoords) { setResolved(true); return; }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const p = [pos.coords.latitude, pos.coords.longitude];
-        setUserPosition(p);
-        setResolved(true);
-        onChangeRef.current(pos.coords.latitude, pos.coords.longitude, '');
-      },
-      () => setResolved(true),
-      { timeout: 5000, enableHighAccuracy: true }
-    );
-  }, [resolved, hasInitialCoords]);
-
-  const handlePositionChange = useCallback(async (newLat, newLng) => {
-    let addr = '';
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLat}&lon=${newLng}&addressdetails=1`,
-        { headers: { 'Accept-Language': 'sq' } }
-      );
-      const data = await res.json();
-      addr = data.display_name || '';
-    } catch {}
-    onChangeRef.current(newLat, newLng, addr);
-  }, []);
-
-  if (typeof window === 'undefined') return null;
+  const handleLngChange = (e) => {
+    const v = e.target.value;
+    onLocationChange(lat || '', v, '');
+  };
 
   return (
     <div className="location-picker">
       <label><FiMapPin /> Lokacioni në Hartë</label>
-      <div className="map-wrapper">
-        <MapContainer center={center} zoom={13} className="leaflet-map" scrollWheelZoom={true}>
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <LocationMarker position={center} onPositionChange={handlePositionChange} />
-          <MapCenterUpdater lat={center[0]} lng={center[1]} />
-        </MapContainer>
+      <div className="form-row">
+        <div className="form-group">
+          <label>Latitude</label>
+          <input type="number" step="any" value={safeLat} onChange={handleLatChange} placeholder="p.sh. 42.6026" />
+        </div>
+        <div className="form-group">
+          <label>Longitude</label>
+          <input type="number" step="any" value={safeLng} onChange={handleLngChange} placeholder="p.sh. 20.9030" />
+        </div>
       </div>
-      <p className="map-hint">Klikoni në hartë ose tërhiqni markerin për të zgjedhur lokacionin</p>
+      {lat && lng && (
+        <div className="map-wrapper" style={{ marginTop: 10 }}>
+          <iframe
+            title="location-preview"
+            width="100%"
+            height="250"
+            style={{ border: 0, borderRadius: 12 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            src={`https://maps.google.com/maps?q=${lat},${lng}&z=14&output=embed`}
+          />
+        </div>
+      )}
     </div>
   );
 }
