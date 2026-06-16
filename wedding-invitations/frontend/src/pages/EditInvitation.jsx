@@ -14,11 +14,8 @@ export default function EditInvitation() {
     groomName: '', brideName: '', phone: '',
     weddingDate: '', weddingTime: '',
     location: '', locationLat: '', locationLng: '', personalMessage: '',
-    customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7', customFont: 'Georgia',
-    photos: []
+    customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7',     customFont: 'Georgia',
   });
-  const [existingPhotos, setExistingPhotos] = useState([]);
-  const [preview, setPreview] = useState([]);
   const [invitation, setInvitation] = useState(null);
 
   useEffect(() => {
@@ -46,9 +43,7 @@ export default function EditInvitation() {
         customPrimaryColor: inv.customPrimaryColor,
         customSecondaryColor: inv.customSecondaryColor,
         customFont: inv.customFont,
-        photos: []
       });
-      setExistingPhotos(inv.photos || []);
     } catch (err) {
       navigate('/dashboard');
     }
@@ -59,25 +54,13 @@ export default function EditInvitation() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePhoto = (e) => {
-    const files = Array.from(e.target.files);
-    setForm(prev => ({ ...prev, photos: [...prev.photos, ...files] }));
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (ev) => setPreview(p => [...p, ev.target.result]);
-      reader.readAsDataURL(file);
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
       const fd = new FormData();
       Object.keys(form).forEach(key => {
-        if (key === 'photos') {
-          form.photos.forEach(photo => fd.append('photos', photo));
-        } else if (key === 'phone') {
+        if (key === 'phone') {
           fd.append('groomPhone', form[key]);
         } else {
           fd.append(key, form[key]);
@@ -157,36 +140,6 @@ export default function EditInvitation() {
               <div className="form-group">
                 <label>Mesazhi Personal</label>
                 <textarea name="personalMessage" value={form.personalMessage} onChange={handleChange} />
-              </div>
-
-              <div className="form-group">
-                <label>Fotot Ekzistuese</label>
-                <div className="photo-previews">
-                  {existingPhotos.map((p, i) => (
-                    <div key={i} className="photo-preview-item">
-                      <img src={p} alt="" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Shto Foto të Reja</label>
-                <div className="photo-upload-area">
-                  <input type="file" multiple accept="image/*" onChange={handlePhoto} id="photo-upload" hidden />
-                  <label htmlFor="photo-upload" className="photo-upload-label">
-                    Shto Foto
-                  </label>
-                </div>
-                {preview.length > 0 && (
-                  <div className="photo-previews">
-                    {preview.map((p, i) => (
-                      <div key={i} className="photo-preview-item">
-                        <img src={p} alt="" />
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               <h2 className="step-title" style={{ marginTop: 40 }}>Personalizo Dizajnin</h2>

@@ -1,5 +1,5 @@
 .location-picker {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .location-picker label {
@@ -9,15 +9,27 @@
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--gold-dark);
+  font-size: 14px;
 }
 
 .map-wrapper {
-  border-radius: var(--radius);
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #e0e0e0;
+  border: 1.5px solid var(--border-light);
   transition: var(--transition);
 }
 
 .map-wrapper:focus-within {
   border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+@media (max-width: 768px) {
+  .location-picker { margin-bottom: 16px; }
+  .location-picker label { font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .location-picker label { font-size: 12px; }
+  .map-wrapper iframe { height: 200px !important; }
 }

@@ -1,34 +1,96 @@
 .footer {
-  background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+  background: linear-gradient(160deg, #1C1814 0%, #2A2420 50%, #1C1814 100%);
   color: var(--cream);
   text-align: center;
-  padding: 50px 20px 30px;
+  padding: 56px 24px 32px;
   margin-top: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+
+.footer::after {
+  content: '✦ ✦ ✦';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(201, 168, 76, 0.06);
+  font-size: 2.5rem;
+  letter-spacing: 40px;
+  line-height: 1;
 }
 
 .footer-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .footer-logo {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-family: 'Great Vibes', cursive;
+  gap: 10px;
+  font-family: var(--font-script);
   font-size: 2rem;
-  color: var(--gold);
+  color: var(--gold-light);
+  opacity: 0.9;
+}
+
+.footer-logo svg {
+  transition: transform 0.3s ease;
+}
+
+.footer-logo:hover svg {
+  transform: scale(1.15);
+}
+
+.footer-content > p {
+  font-size: 14px;
+  color: rgba(250, 247, 242, 0.5);
+  font-style: italic;
+  max-width: 360px;
 }
 
 .footer-divider {
   color: var(--gold);
-  letter-spacing: 8px;
-  font-size: 0.9rem;
+  letter-spacing: 12px;
+  font-size: 0.7rem;
+  opacity: 0.35;
 }
 
 .footer-copy {
-  font-size: 13px;
-  color: #888;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 768px) {
+  .footer { padding: 40px 16px 24px; margin-top: 60px; }
+  .footer-logo { font-size: 1.6rem; }
+  .footer-content > p { font-size: 13px; }
+  .footer::after { font-size: 1.8rem; letter-spacing: 20px; }
+}
+
+@media (max-width: 480px) {
+  .footer { padding: 32px 12px 20px; margin-top: 40px; }
+  .footer-logo { font-size: 1.4rem; }
+  .footer-content { gap: 12px; }
+  .footer-content > p { font-size: 12px; max-width: 280px; }
+  .footer-copy { font-size: 11px; }
+  .footer-divider { font-size: 0.6rem; letter-spacing: 8px; }
+  .footer::after { font-size: 1.4rem; letter-spacing: 14px; }
 }

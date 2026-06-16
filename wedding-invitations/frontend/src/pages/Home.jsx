@@ -35,7 +35,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <span className="hero-badge">Ftesa Dasme Online</span>
-            <h1>Krijo ftesën perfekte<br />për ditën tënde speciale</h1>
+            <h1>Krijo ftesën perfekte për ditën tënde speciale</h1>
             <p>Zgjidh nga template-t tona elegante dhe personalizo çdo detaj për një ftesë unike dhe të paharrueshme.</p>
             <div className="hero-buttons">
               {user ? (

@@ -33,7 +33,7 @@ router.get('/all', auth, async (req, res) => {
 
 router.get('/public/:slug', async (req, res) => {
   try {
-    const invitation = await Invitation.findOne({ slug: req.params.slug, isPublished: true }).populate('template');
+    const invitation = await Invitation.findOne({ slug: req.params.slug }).populate('template');
     if (!invitation) return res.status(404).json({ error: 'Invitation not found' });
     res.json(invitation);
   } catch (error) {

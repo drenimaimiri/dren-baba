@@ -5,6 +5,8 @@ import { FiPlus, FiEye, FiEdit2, FiTrash2, FiGlobe, FiCopy } from 'react-icons/f
 import { getMyInvitations, deleteInvitation, publishInvitation } from '../api';
 import './Dashboard.css';
 
+const BASE_URL = import.meta.env.VITE_PUBLIC_URL || window.location.origin;
+
 export default function Dashboard() {
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ export default function Dashboard() {
   };
 
   const copyLink = (slug) => {
-    navigator.clipboard.writeText(`${window.location.origin}/invitation/${slug}`);
+    navigator.clipboard.writeText(`${BASE_URL}/invitation/${slug}`);
     alert('Linku u kopjua!');
   };
 

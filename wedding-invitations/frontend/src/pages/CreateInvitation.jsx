@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiUpload, FiClock, FiHeart, FiSend } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiClock, FiHeart, FiSend, FiCopy, FiEye, FiEdit2 } from 'react-icons/fi';
 import { getTemplates, createInvitation } from '../api';
 import LocationPicker from '../components/LocationPicker';
+import { playSound } from '../utils/playSound';
 import '../components/LocationPicker.css';
 import './CreateInvitation.css';
+
+const BASE_URL = import.meta.env.VITE_PUBLIC_URL || window.location.origin;
 
 export default function CreateInvitation() {
   const [searchParams] = useSearchParams();
@@ -27,10 +30,9 @@ export default function CreateInvitation() {
     customPrimaryColor: '#D4AF37',
     customSecondaryColor: '#FFF8E7',
     customFont: 'Georgia',
-    photos: []
   });
-  const [preview, setPreview] = useState([]);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(null);
 
   const goToStep = (nextStep) => {
     setError('');
@@ -50,21 +52,6 @@ export default function CreateInvitation() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePhoto = (e) => {
-    const files = Array.from(e.target.files);
-    setForm(prev => ({ ...prev, photos: [...prev.photos, ...files] }));
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (ev) => setPreview(p => [...p, ev.target.result]);
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const removePhoto = (index) => {
-    setForm(prev => ({ ...prev, photos: prev.photos.filter((_, i) => i !== index) }));
-    setPreview(p => p.filter((_, i) => i !== index));
-  };
-
   const handleLocationChange = (lat, lng, address) => {
     setForm(prev => ({
       ...prev,
@@ -76,13 +63,12 @@ export default function CreateInvitation() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    playSound();
     setLoading(true);
     try {
       const fd = new FormData();
       Object.keys(form).forEach(key => {
-        if (key === 'photos') {
-          form.photos.forEach(photo => fd.append('photos', photo));
-        } else if (key === 'phone') {
+        if (key === 'phone') {
           fd.append('groomPhone', form[key]);
         } else {
           fd.append(key, form[key]);
@@ -91,7 +77,7 @@ export default function CreateInvitation() {
       fd.append('isPublished', 'false');
 
       const res = await createInvitation(fd);
-      navigate(`/edit/${res.data._id}`);
+      setSuccess(res.data);
     } catch (err) {
       alert('Error: ' + (err.response?.data?.error || 'Something went wrong'));
     } finally {
@@ -207,26 +193,6 @@ export default function CreateInvitation() {
                   <label>Mesazhi Personal</label>
                   <textarea name="personalMessage" value={form.personalMessage} onChange={handleChange} placeholder="Shkruaj një mesazh të bukur për të ftuarit..." />
                 </div>
-                <div className="form-group">
-                  <label>Fotot e Çiftit</label>
-                  <div className="photo-upload-area">
-                    <input type="file" multiple accept="image/*" onChange={handlePhoto} id="photo-upload" hidden />
-                    <label htmlFor="photo-upload" className="photo-upload-label">
-                      <FiUpload />
-                      <span>Shto Foto</span>
-                    </label>
-                  </div>
-                  {preview.length > 0 && (
-                    <div className="photo-previews">
-                      {preview.map((p, i) => (
-                        <div key={i} className="photo-preview-item">
-                          <img src={p} alt="" />
-                          <button type="button" onClick={() => removePhoto(i)}>×</button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </div>
               <div className="step-buttons">
                 <button type="button" className="btn btn-outline" onClick={() => goToStep(1)}>Prapa</button>
@@ -291,6 +257,67 @@ export default function CreateInvitation() {
             </motion.div>
           )}
         </form>
+
+        <AnimatePresence>
+          {success && (
+            <motion.div
+              className="success-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <motion.div
+                className="success-modal"
+                initial={{ opacity: 0, scale: 0.8, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: 30 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              >
+                <div className="success-icon">💍</div>
+                <h2>Ftesa u krijua me sukses!</h2>
+                <p>Linku i ftesës suaj:</p>
+                <div className="success-link-box">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${BASE_URL}/invitation/${success.slug}`}
+                    className="success-link-input"
+                  />
+                  <button
+                    className="success-copy-btn"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${BASE_URL}/invitation/${success.slug}`);
+                      alert('Linku u kopjua!');
+                    }}
+                    title="Kopjo linkun"
+                  >
+                    <FiCopy />
+                  </button>
+                </div>
+                <div className="success-actions">
+                  <button
+                    className="btn btn-gold"
+                    onClick={() => window.open(`/invitation/${success.slug}`, '_blank')}
+                  >
+                    <FiEye /> Shiko Ftesën
+                  </button>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => navigate(`/edit/${success._id}`)}
+                  >
+                    <FiEdit2 /> Ndrysho Ftesën
+                  </button>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    Shko në Dashboard
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
