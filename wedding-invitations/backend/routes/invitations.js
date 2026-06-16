@@ -6,8 +6,13 @@ const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
+const uploadDir = process.env.VERCEL === '1' ? '/tmp/uploads' : 'uploads';
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+  destination: (req, file, cb) => {
+    const fs = require('fs');
+    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => cb(null, Date.now() + '-' + Math.random().toString(36).substring(7) + path.extname(file.originalname))
 });
 const upload = multer({ storage });

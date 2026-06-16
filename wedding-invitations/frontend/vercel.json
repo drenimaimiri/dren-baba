@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://dren-baba-dpr4.vercel.app/api/$1" },
+    { "source": "/uploads/(.*)", "destination": "https://dren-baba-dpr4.vercel.app/uploads/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
