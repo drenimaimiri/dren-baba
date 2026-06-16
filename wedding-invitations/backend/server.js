@@ -22,11 +22,10 @@ app.use('/api/invitations', invitationRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.get('/api/health', (req, res) => {
-  const mongoUri = process.env.MONGODB_URI || '(not set)';
-  res.json({ status: 'ok', mongoUri: mongoUri.substring(0, 40) + '...', mongooseState: mongoose.connection.readyState, timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 30000, bufferTimeoutMS: 30000 })
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err.message));
 
