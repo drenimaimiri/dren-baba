@@ -94,9 +94,16 @@ export default function Dashboard() {
                   background: `linear-gradient(135deg, ${inv.customPrimaryColor || '#D4AF37'}, ${inv.customSecondaryColor || '#FFF8E7'})`
                 }}>
                   <div className="inv-card-names">
-                    <h3>{inv.groomName}</h3>
-                    <span className="inv-card-ampersand">&</span>
-                    <h3>{inv.brideName}</h3>
+                    {inv.invitationType === 'kanagjegj' ? (
+                      <h3>{inv.brideName}</h3>
+                    ) : (
+                      <><h3>{inv.groomName}</h3>
+                        <span className="inv-card-ampersand">&</span>
+                        <h3>{inv.brideName}</h3></>
+                    )}
+                  </div>
+                  <div className="inv-card-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : '#D4AF37' }}>
+                    {inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : 'Dasëm'}
                   </div>
                   <div className={`inv-card-status ${inv.isPublished ? 'published' : 'draft'}`}>
                     {inv.isPublished ? 'Publikuar' : 'Draft'}
@@ -123,7 +130,7 @@ export default function Dashboard() {
                         <FiCopy />
                       </button>
                     )}
-                    <button className="action-btn" onClick={() => { setQrInv(inv); setQrTarget(inv.groomPhone ? 'groom' : 'bride'); }} title="QR kod për WhatsApp">
+                    <button className="action-btn" onClick={() => { setQrInv(inv); setQrTarget(inv.invitationType === 'kanagjegj' ? 'bride' : (inv.groomPhone ? 'groom' : 'bride')); }} title="QR kod për WhatsApp">
                       <FiSmartphone />
                     </button>
                     <button className="action-btn action-delete" onClick={() => handleDelete(inv._id)} title="Fshij">
@@ -148,9 +155,11 @@ export default function Dashboard() {
           >
             <button className="qr-modal-close" onClick={() => setQrInv(null)}>&times;</button>
             <h3 className="qr-modal-title">QR Kod për WhatsApp</h3>
-            <p className="qr-modal-names">{qrInv.groomName} & {qrInv.brideName}</p>
+            <p className="qr-modal-names">{qrInv.invitationType === 'kanagjegj' ? qrInv.brideName : `${qrInv.groomName} & ${qrInv.brideName}`}</p>
 
-            {qrInv.groomPhone && qrInv.bridePhone && (
+            {qrInv.invitationType === 'kanagjegj' ? (
+              <p className="qr-modal-label" style={{ marginBottom: 20 }}>{qrInv.brideName}</p>
+            ) : qrInv.groomPhone && qrInv.bridePhone ? (
               <div className="qr-modal-toggle">
                 <button
                   className={`qr-modal-btn ${qrTarget === 'groom' ? 'active' : ''}`}
@@ -167,7 +176,7 @@ export default function Dashboard() {
                   {qrInv.brideName}
                 </button>
               </div>
-            )}
+            ) : null}
 
             <div className="qr-modal-code">
               <QRCodeCanvas

@@ -44,8 +44,8 @@ export default function CreateQR() {
         >
           <div className="createqr-header">
             <FiSmartphone className="createqr-icon" />
-            <h1>Krijo QR Kod për WhatsApp</h1>
-            <p>Shkruaj numrin e telefonit dhe gjenero një QR kod që të çon direkt në WhatsApp</p>
+            <h1>Krijo QR Code-in për WhatsApp</h1>
+            <p>Shkruaj numrin e telefonit dhe gjenero një QR code-in që të qon direkt në WhatsApp</p>
           </div>
 
           <form onSubmit={handleGenerate} className="createqr-form">

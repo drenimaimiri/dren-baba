@@ -55,7 +55,8 @@ export default function InvitationView() {
   const openInvitation = () => {
     if (isOpen) return;
     setIsOpen(true);
-    const audio = new Audio('/Irma Libohova - Martesa Jonë.mp3');
+    const defaultSong = inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3';
+    const audio = new Audio(defaultSong);
     audio.loop = true;
     audio.volume = 0.4;
     audio.play().catch(() => {});
@@ -141,14 +142,14 @@ export default function InvitationView() {
                 <div className="envelope-flap">
                   <div className="envelope-flap-inner"></div>
                 </div>
-                <div className="envelope-seal">{inv.groomName?.charAt(0)}{inv.brideName?.charAt(0)}</div>
+                <div className="envelope-seal">{inv.invitationType === 'kanagjegj' ? inv.brideName?.charAt(0) : `${inv.groomName?.charAt(0)}${inv.brideName?.charAt(0)}`}</div>
                 <div className="env-invitation-card">
                   <div className="env-card-heart">✧</div>
-                  <div className="env-card-names">{inv.groomName} <span>&</span> {inv.brideName}</div>
+                  <div className="env-card-names">{inv.invitationType === 'kanagjegj' ? inv.brideName : <>{inv.groomName} <span>&</span> {inv.brideName}</>}</div>
                   <div className="env-card-line"></div>
-                  <div className="env-card-text">Bashkohuni me ne në këtë ditë të veçantë</div>
+                  <div className="env-card-text">{inv.invitationType === 'kanagjegj' ? 'Bashkohuni me ne në këtë natë të veçantë' : 'Bashkohuni me ne në këtë ditë të veçantë'}</div>
                   <div className="env-card-date">{weddingDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                  <div className="env-card-sub">Dasma Jonë</div>
+                  <div className="env-card-sub">{inv.invitationType === 'kanagjegj' ? 'Kanagjegji Jonë' : 'Dasma Jonë'}</div>
                 </div>
                 <div className="envelope-shadow"></div>
               </div>
@@ -176,11 +177,15 @@ export default function InvitationView() {
             <div className="inv-hero-content">
               <div className="inv-hero-ornament" style={{ color: primaryColor }}>✦ ✦ ✦</div>
               <h1 className="inv-couple-names">
-                <span>{inv.groomName}</span>
-                <span className="inv-ampersand" style={{ color: primaryColor }}>&</span>
-                <span>{inv.brideName}</span>
+                {inv.invitationType === 'kanagjegj' ? (
+                  <span>{inv.brideName}</span>
+                ) : (
+                  <><span>{inv.groomName}</span>
+                    <span className="inv-ampersand" style={{ color: primaryColor }}>&</span>
+                    <span>{inv.brideName}</span></>
+                )}
               </h1>
-              <p className="inv-hero-subtitle">Ju ftojnë në dasmën e tyre</p>
+              <p className="inv-hero-subtitle">{inv.invitationType === 'kanagjegj' ? 'Ju fton në kanagjegjin e saj' : 'Ju ftojnë në dasmën e tyre'}</p>
               <div className="inv-hero-date">
                 <FiCalendar style={{ color: primaryColor }} />
                 {weddingDate.toLocaleDateString('sq-AL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -279,7 +284,7 @@ export default function InvitationView() {
                   >
                     Galeria
                   </motion.h2>
-                  <p className="inv-section-subtitle">Momente të bukura nga dashuria juaj</p>
+                  <p className="inv-section-subtitle">{inv.invitationType === 'kanagjegj' ? 'Momente të bukura nga nata e kanagjegjit' : 'Momente të bukura nga dashuria juaj'}</p>
                   <div className="inv-gallery">
                     {inv.photos.map((photo, i) => (
                       <motion.div
@@ -408,7 +413,7 @@ export default function InvitationView() {
                 <div className="inv-footer-content">
                   <FiHeart style={{ fontSize: '2rem', color: 'white', opacity: 0.8 }} />
                   <h2 style={{ color: 'white', fontFamily: 'Great Vibes, cursive', fontSize: '2rem' }}>
-                    {inv.groomName} & {inv.brideName}
+                    {inv.invitationType === 'kanagjegj' ? inv.brideName : `${inv.groomName} & ${inv.brideName}`}
                   </h2>
                   <p style={{ color: 'rgba(255,255,255,0.8)' }}>
                     {weddingDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'long', year: 'numeric' })}

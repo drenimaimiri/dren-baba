@@ -103,6 +103,19 @@
   opacity: 0.7;
 }
 
+.inv-card-type-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+
 .inv-card-status {
   position: absolute;
   top: 14px;
@@ -311,6 +324,7 @@
   .inv-card-names h3 { font-size: 1rem; }
   .inv-card-body { padding: 14px; }
   .inv-card-date { font-size: 13px; }
+  .inv-card-type-badge { top: 10px; left: 10px; padding: 3px 10px; font-size: 9px; }
   .inv-card-status { top: 10px; right: 10px; padding: 3px 10px; font-size: 9px; }
   .inv-card-actions { gap: 4px; }
   .action-btn { width: 36px; height: 36px; }

@@ -50,7 +50,7 @@ export default function Navbar({ theme, toggleTheme }) {
                 <FiGrid /> Dashboard
               </Link>
               <Link to="/create-qr" onClick={() => setMenuOpen(false)}>
-                <FiSmartphone /> QR Kod
+                <FiSmartphone /> QR Code
               </Link>
               <Link to="/create" onClick={() => setMenuOpen(false)} className="nav-create-btn">
                 Krijo Ftesë

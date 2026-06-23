@@ -142,6 +142,7 @@ export default function AdminDashboard() {
                 <tr>
                   <th>Çifti</th>
                   <th>Përdoruesi</th>
+                  <th>Lloji</th>
                   <th>Data</th>
                   <th>Statusi</th>
                   <th>RSVP</th>
@@ -150,8 +151,9 @@ export default function AdminDashboard() {
               <tbody>
                 {invitations.map(inv => (
                   <tr key={inv._id}>
-                    <td><strong>{inv.groomName} & {inv.brideName}</strong></td>
+                    <td><strong>{inv.invitationType === 'kanagjegj' ? inv.brideName : `${inv.groomName} & ${inv.brideName}`}</strong></td>
                     <td>{inv.user?.name || 'N/A'}</td>
+                    <td><span className="admin-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : '#D4AF37' }}>{inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : 'Dasëm'}</span></td>
                     <td>{new Date(inv.weddingDate).toLocaleDateString('sq-AL')}</td>
                     <td><span className={`status-badge ${inv.isPublished ? 'published' : 'draft'}`}>{inv.isPublished ? 'Publik' : 'Draft'}</span></td>
                     <td>{inv.rsvpList?.length || 0}</td>

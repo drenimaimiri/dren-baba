@@ -14,9 +14,10 @@ export default function CreateInvitation() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
+    invitationType: 'dasem',
     templateId: searchParams.get('template') || '',
     groomName: '',
     brideName: '',
@@ -30,6 +31,7 @@ export default function CreateInvitation() {
     customPrimaryColor: '#D4AF37',
     customSecondaryColor: '#FFF8E7',
     customFont: 'Georgia',
+
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
@@ -69,7 +71,7 @@ export default function CreateInvitation() {
       const fd = new FormData();
       Object.keys(form).forEach(key => {
         if (key === 'phone') {
-          fd.append('groomPhone', form[key]);
+          fd.append(form.invitationType === 'kanagjegj' ? 'bridePhone' : 'groomPhone', form[key]);
         } else {
           fd.append(key, form[key]);
         }
@@ -96,16 +98,20 @@ export default function CreateInvitation() {
         </div>
 
         <div className="create-steps">
-          <div className={`step ${step >= 1 ? 'active' : ''}`}>
+          <div className={`step ${step >= 0 ? 'active' : ''}`}>
             <div className="step-num">1</div>
+            <span>Lloji</span>
+          </div>
+          <div className={`step ${step >= 1 ? 'active' : ''}`}>
+            <div className="step-num">2</div>
             <span>Templati</span>
           </div>
           <div className={`step ${step >= 2 ? 'active' : ''}`}>
-            <div className="step-num">2</div>
+            <div className="step-num">3</div>
             <span>Detajet</span>
           </div>
           <div className={`step ${step >= 3 ? 'active' : ''}`}>
-            <div className="step-num">3</div>
+            <div className="step-num">4</div>
             <span>Dizajni</span>
           </div>
         </div>
@@ -113,6 +119,35 @@ export default function CreateInvitation() {
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
+          {step === 0 && (
+            <motion.div key="step0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+              <h2 className="step-title">Zgjidh Llojin e Ftesës</h2>
+              <div className="type-select-grid">
+                <div
+                  className={`type-select-card ${form.invitationType === 'dasem' ? 'selected' : ''}`}
+                  onClick={() => setForm(prev => ({ ...prev, invitationType: 'dasem' }))}
+                >
+                  <div className="type-select-icon">💍</div>
+                  <h3>Dasëm</h3>
+                  <p>Ftesë për ceremoninë e martesës</p>
+                </div>
+                <div
+                  className={`type-select-card ${form.invitationType === 'kanagjegj' ? 'selected' : ''}`}
+                  onClick={() => setForm(prev => ({ ...prev, invitationType: 'kanagjegj' }))}
+                >
+                  <div className="type-select-icon">🌙</div>
+                  <h3>Kanagjegj</h3>
+                  <p>Ftesë për natën e kanagjegjit</p>
+                </div>
+              </div>
+              <div className="step-buttons">
+                <button type="button" className="btn btn-gold" onClick={() => goToStep(1)}>
+                  Vazhdo <FiHeart />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
               <h2 className="step-title">Zgjidhni një Template</h2>
@@ -143,6 +178,7 @@ export default function CreateInvitation() {
                 ))}
               </div>
               <div className="step-buttons">
+                <button type="button" className="btn btn-outline" onClick={() => goToStep(0)}>Prapa</button>
                 <button type="button" className="btn btn-gold" onClick={() => goToStep(2)} disabled={!form.templateId}>
                   Vazhdo <FiHeart />
                 </button>
@@ -152,13 +188,15 @@ export default function CreateInvitation() {
 
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="step-title">Detajet e Dasmës</h2>
+              <h2 className="step-title">{form.invitationType === 'kanagjegj' ? 'Detajet e Kanagjegjit' : 'Detajet e Dasmës'}</h2>
               <div className="create-form">
                 <div className="form-row">
-                  <div className="form-group">
-                    <label>Emri i Dhëndrit</label>
-                    <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required placeholder="Shkruaj emrin e dhëndrit" />
-                  </div>
+                  {form.invitationType !== 'kanagjegj' && (
+                    <div className="form-group">
+                      <label>Emri i Dhëndrit</label>
+                      <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required={form.invitationType !== 'kanagjegj'} placeholder="Shkruaj emrin e dhëndrit" />
+                    </div>
+                  )}
                   <div className="form-group">
                     <label>Emri i Nuses</label>
                     <input type="text" name="brideName" value={form.brideName} onChange={handleChange} required placeholder="Shkruaj emrin e nuses" />
@@ -166,7 +204,7 @@ export default function CreateInvitation() {
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label><FiClock /> Data e Dasmës</label>
+                    <label><FiClock /> {form.invitationType === 'kanagjegj' ? 'Data e Kanagjegjit' : 'Data e Dasmës'}</label>
                     <input type="date" name="weddingDate" value={form.weddingDate} onChange={handleChange} required />
                   </div>
                   <div className="form-group">
@@ -229,6 +267,7 @@ export default function CreateInvitation() {
                       <option value="Lora">Lora</option>
                     </select>
                   </div>
+
                 </div>
 
                 <div className="design-preview-box" style={{
@@ -237,9 +276,15 @@ export default function CreateInvitation() {
                 }}>
                   <div className="preview-ornament" style={{ color: form.customPrimaryColor }}>✦</div>
                   <div className="preview-couple">
-                    <span>{form.groomName || 'Dhëndri'}</span>
-                    <span style={{ color: form.customPrimaryColor }}>❤</span>
-                    <span>{form.brideName || 'Nusja'}</span>
+                    {form.invitationType === 'kanagjegj' ? (
+                      <span>{form.brideName || 'Nusja'}</span>
+                    ) : (
+                      <>
+                        <span>{form.groomName || 'Dhëndri'}</span>
+                        <span style={{ color: form.customPrimaryColor }}>❤</span>
+                        <span>{form.brideName || 'Nusja'}</span>
+                      </>
+                    )}
                   </div>
                   {form.weddingDate && <div className="preview-date">{new Date(form.weddingDate).toLocaleDateString('sq-AL')}</div>}
                   {form.location && <div className="preview-location">{form.location}</div>}

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const invitationSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   template: { type: mongoose.Schema.Types.ObjectId, ref: 'Template', required: true },
-  groomName: { type: String, required: true },
+  groomName: { type: String, default: '', required: function() { return this.invitationType === 'dasem'; } },
   brideName: { type: String, required: true },
   weddingDate: { type: Date, required: true },
   weddingTime: { type: String, required: true },
@@ -17,6 +17,8 @@ const invitationSchema = new mongoose.Schema({
   customPrimaryColor: { type: String, default: '#D4AF37' },
   customSecondaryColor: { type: String, default: '#FFF8E7' },
   customFont: { type: String, default: 'Georgia' },
+  customMp3Url: { type: String, default: '' },
+  invitationType: { type: String, enum: ['dasem', 'kanagjegj'], default: 'dasem' },
   slug: { type: String, unique: true },
   isPublished: { type: Boolean, default: false },
   rsvpList: [{
@@ -32,7 +34,8 @@ const invitationSchema = new mongoose.Schema({
 invitationSchema.pre('save', function (next) {
   if (!this.slug) {
     const random = Math.random().toString(36).substring(2, 8);
-    this.slug = `${this.groomName}-${this.brideName}-${random}`
+    const namePart = this.groomName ? `${this.groomName}-${this.brideName}` : this.brideName;
+    this.slug = `${namePart}-${random}`
       .toLowerCase()
       .replace(/\s+/g, '-');
   }

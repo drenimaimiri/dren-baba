@@ -11,6 +11,7 @@ export default function EditInvitation() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
+    invitationType: 'dasem',
     groomName: '', brideName: '', phone: '',
     weddingDate: '', weddingTime: '',
     location: '', locationLat: '', locationLng: '', personalMessage: '',
@@ -31,9 +32,10 @@ export default function EditInvitation() {
       if (!inv) return navigate('/dashboard');
       setInvitation(inv);
       setForm({
+        invitationType: inv.invitationType || 'dasem',
         groomName: inv.groomName,
         brideName: inv.brideName,
-        phone: inv.groomPhone || '',
+        phone: inv.invitationType === 'kanagjegj' ? (inv.bridePhone || '') : (inv.groomPhone || ''),
         weddingDate: inv.weddingDate?.split('T')[0] || '',
         weddingTime: inv.weddingTime,
         location: inv.location,
@@ -43,6 +45,7 @@ export default function EditInvitation() {
         customPrimaryColor: inv.customPrimaryColor,
         customSecondaryColor: inv.customSecondaryColor,
         customFont: inv.customFont,
+
       });
     } catch (err) {
       navigate('/dashboard');
@@ -61,7 +64,7 @@ export default function EditInvitation() {
       const fd = new FormData();
       Object.keys(form).forEach(key => {
         if (key === 'phone') {
-          fd.append('groomPhone', form[key]);
+          fd.append(form.invitationType === 'kanagjegj' ? 'bridePhone' : 'groomPhone', form[key]);
         } else {
           fd.append(key, form[key]);
         }
@@ -92,18 +95,41 @@ export default function EditInvitation() {
       <div className="container">
         <div className="create-header">
           <h1>Ndrysho Ftesën</h1>
-          <p>{invitation.groomName} & {invitation.brideName}</p>
+          <p>{invitation.invitationType === 'kanagjegj' ? invitation.brideName : `${invitation.groomName} & ${invitation.brideName}`}</p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <h2 className="step-title">Detajet e Dasmës</h2>
+            <h2 className="step-title">{form.invitationType === 'kanagjegj' ? 'Detajet e Kanagjegjit' : 'Detajet e Dasmës'}</h2>
             <div className="create-form">
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Emri i Dhëndrit</label>
-                  <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required />
+              <div className="form-group">
+                <label>Lloji i Ftesës</label>
+                <div className="type-select-grid" style={{ maxWidth: '100%', marginBottom: 20 }}>
+                  <div
+                    className={`type-select-card ${form.invitationType === 'dasem' ? 'selected' : ''}`}
+                    onClick={() => setForm(prev => ({ ...prev, invitationType: 'dasem' }))}
+                    style={{ padding: '16px 20px' }}
+                  >
+                    <div className="type-select-icon" style={{ fontSize: '1.6rem', marginBottom: 6 }}>💍</div>
+                    <h3 style={{ fontSize: '1rem' }}>Dasëm</h3>
+                  </div>
+                  <div
+                    className={`type-select-card ${form.invitationType === 'kanagjegj' ? 'selected' : ''}`}
+                    onClick={() => setForm(prev => ({ ...prev, invitationType: 'kanagjegj' }))}
+                    style={{ padding: '16px 20px' }}
+                  >
+                    <div className="type-select-icon" style={{ fontSize: '1.6rem', marginBottom: 6 }}>🌙</div>
+                    <h3 style={{ fontSize: '1rem' }}>Kanagjegj</h3>
+                  </div>
                 </div>
+              </div>
+              <div className="form-row">
+                {form.invitationType !== 'kanagjegj' && (
+                  <div className="form-group">
+                    <label>Emri i Dhëndrit</label>
+                    <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required={form.invitationType !== 'kanagjegj'} />
+                  </div>
+                )}
                 <div className="form-group">
                   <label>Emri i Nuses</label>
                   <input type="text" name="brideName" value={form.brideName} onChange={handleChange} required />
@@ -111,7 +137,7 @@ export default function EditInvitation() {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Data e Dasmës</label>
+                  <label>{form.invitationType === 'kanagjegj' ? 'Data e Kanagjegjit' : 'Data e Dasmës'}</label>
                   <input type="date" name="weddingDate" value={form.weddingDate} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
@@ -168,6 +194,7 @@ export default function EditInvitation() {
                       <option value="Lora">Lora</option>
                     </select>
                   </div>
+
                 </div>
 
                 <div className="design-preview-box" style={{
@@ -176,9 +203,13 @@ export default function EditInvitation() {
                 }}>
                   <div className="preview-ornament" style={{ color: form.customPrimaryColor }}>✦</div>
                   <div className="preview-couple">
-                    <span>{form.groomName}</span>
-                    <span style={{ color: form.customPrimaryColor }}>❤</span>
-                    <span>{form.brideName}</span>
+                    {form.invitationType === 'kanagjegj' ? (
+                      <span>{form.brideName}</span>
+                    ) : (
+                      <><span>{form.groomName}</span>
+                        <span style={{ color: form.customPrimaryColor }}>❤</span>
+                        <span>{form.brideName}</span></>
+                    )}
                   </div>
                   {form.weddingDate && <div className="preview-date">{new Date(form.weddingDate).toLocaleDateString('sq-AL')}</div>}
                   <div className="preview-ornament" style={{ color: form.customPrimaryColor }}>✦</div>

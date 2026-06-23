@@ -54,7 +54,7 @@ router.post('/', auth, upload.array('photos', 10), async (req, res) => {
     const invitation = await Invitation.create({
       user: req.user._id,
       template: data.templateId,
-      groomName: data.groomName,
+      groomName: data.invitationType === 'kanagjegj' ? undefined : data.groomName,
       brideName: data.brideName,
       groomPhone: data.groomPhone || '',
       bridePhone: data.bridePhone || '',
@@ -68,6 +68,8 @@ router.post('/', auth, upload.array('photos', 10), async (req, res) => {
       customPrimaryColor: data.customPrimaryColor || '#D4AF37',
       customSecondaryColor: data.customSecondaryColor || '#FFF8E7',
       customFont: data.customFont || 'Georgia',
+      customMp3Url: data.customMp3Url || '',
+      invitationType: data.invitationType || 'dasem',
       isPublished: data.isPublished === 'true'
     });
 
@@ -82,7 +84,7 @@ router.put('/:id', auth, upload.array('photos', 10), async (req, res) => {
     const invitation = await Invitation.findOne({ _id: req.params.id, user: req.user._id });
     if (!invitation) return res.status(404).json({ error: 'Invitation not found' });
 
-    const fields = ['groomName', 'brideName', 'groomPhone', 'bridePhone', 'weddingDate', 'weddingTime', 'location', 'locationLat', 'locationLng', 'personalMessage', 'customPrimaryColor', 'customSecondaryColor', 'customFont', 'template', 'isPublished'];
+    const fields = ['groomName', 'brideName', 'groomPhone', 'bridePhone', 'weddingDate', 'weddingTime', 'location', 'locationLat', 'locationLng', 'personalMessage', 'customPrimaryColor', 'customSecondaryColor', 'customFont', 'customMp3Url', 'template', 'invitationType', 'isPublished'];
     fields.forEach(f => { if (req.body[f] !== undefined) invitation[f] = req.body[f]; });
 
     if (req.files && req.files.length > 0) {
