@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiHeart, FiUser, FiLogOut, FiMenu, FiX, FiGrid, FiSun, FiMoon } from 'react-icons/fi';
+import { FiHeart, FiUser, FiLogOut, FiMenu, FiX, FiGrid, FiSun, FiMoon, FiSmartphone } from 'react-icons/fi';
 import './Navbar.css';
 
 export default function Navbar({ theme, toggleTheme }) {
@@ -48,6 +48,9 @@ export default function Navbar({ theme, toggleTheme }) {
             <>
               <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
                 <FiGrid /> Dashboard
+              </Link>
+              <Link to="/create-qr" onClick={() => setMenuOpen(false)}>
+                <FiSmartphone /> QR Kod
               </Link>
               <Link to="/create" onClick={() => setMenuOpen(false)} className="nav-create-btn">
                 Krijo Ftesë

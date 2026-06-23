@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiHeart, FiMapPin, FiClock, FiCalendar, FiPhone, FiMessageSquare } from 'react-icons/fi';
 import { getPublicInvitation } from '../api';
+import { QRCodeCanvas } from 'qrcode.react';
 import './InvitationView.css';
 
 export default function InvitationView() {
@@ -15,6 +16,7 @@ export default function InvitationView() {
   const [isOpen, setIsOpen] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [qrTarget, setQrTarget] = useState('groom');
   const audioRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -67,6 +69,16 @@ export default function InvitationView() {
     }, 2600);
   };
 
+  useEffect(() => {
+    if (inv) {
+      if (!inv.groomPhone && inv.bridePhone) {
+        setQrTarget('bride');
+      } else {
+        setQrTarget('groom');
+      }
+    }
+  }, [inv]);
+
   const toggleMusic = () => {
     if (!audioRef.current) return;
     if (audioRef.current.paused) {
@@ -94,6 +106,12 @@ export default function InvitationView() {
   const fontFamily = inv.customFont || 'Georgia';
   const primaryColor = inv.customPrimaryColor || '#D4AF37';
   const weddingDate = new Date(inv.weddingDate);
+  const groomPhone = inv.groomPhone;
+  const bridePhone = inv.bridePhone;
+  const hasBothPhones = groomPhone && bridePhone;
+  const effectiveTarget = !groomPhone ? 'bride' : qrTarget;
+  const qrNumber = effectiveTarget === 'groom' ? groomPhone : bridePhone;
+  const waNumber = (qrNumber || '').replace(/[^0-9]/g, '');
 
   return (
     <div className="invitation-view" style={{ fontFamily }}>
@@ -312,7 +330,7 @@ export default function InvitationView() {
               </section>
             )}
 
-            {(inv.groomPhone || inv.bridePhone) && (
+            {(groomPhone || bridePhone) && (
               <section className="inv-section">
                 <div className="container">
                   <motion.div
@@ -329,10 +347,10 @@ export default function InvitationView() {
                     <div className="contact-single">
                       <div className="contact-card" style={{ borderColor: primaryColor + '30' }}>
                         <div className="contact-actions" style={{ flexDirection: 'column', gap: 15 }}>
-                          <p className="contact-phone-single">{inv.groomPhone || inv.bridePhone}</p>
+                          <p className="contact-phone-single">{groomPhone || bridePhone}</p>
                           <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                             <a
-                              href={`https://wa.me/${(inv.groomPhone || inv.bridePhone).replace(/[^0-9]/g, '')}`}
+                              href={`https://wa.me/${(groomPhone || bridePhone).replace(/[^0-9]/g, '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="contact-btn whatsapp-btn"
@@ -344,6 +362,42 @@ export default function InvitationView() {
                         </div>
                       </div>
                     </div>
+
+                    {waNumber && (
+                      <div className="qr-section">
+                        <div className="qr-divider"><span style={{ color: primaryColor }}>ose</span></div>
+                        <h3 className="qr-title">Skanoni QR kod për WhatsApp</h3>
+                        {hasBothPhones && (
+                          <div className="qr-toggle">
+                            <button
+                              className={`qr-toggle-btn ${effectiveTarget === 'groom' ? 'active' : ''}`}
+                              onClick={() => setQrTarget('groom')}
+                              style={effectiveTarget === 'groom' ? { background: primaryColor, color: '#fff', borderColor: primaryColor } : { borderColor: primaryColor + '40', color: primaryColor }}
+                            >
+                              {inv.groomName}
+                            </button>
+                            <button
+                              className={`qr-toggle-btn ${effectiveTarget === 'bride' ? 'active' : ''}`}
+                              onClick={() => setQrTarget('bride')}
+                              style={effectiveTarget === 'bride' ? { background: primaryColor, color: '#fff', borderColor: primaryColor } : { borderColor: primaryColor + '40', color: primaryColor }}
+                            >
+                              {inv.brideName}
+                            </button>
+                          </div>
+                        )}
+                        <div className="qr-code-box" style={{ borderColor: primaryColor + '20' }}>
+                          <QRCodeCanvas
+                            value={`https://wa.me/${waNumber}`}
+                            size={160}
+                            bgColor="#ffffff"
+                            fgColor={primaryColor}
+                            level="M"
+                            style={{ borderRadius: 12 }}
+                          />
+                          <p className="qr-label">Skano për të dërguar mesazh</p>
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 </div>
               </section>

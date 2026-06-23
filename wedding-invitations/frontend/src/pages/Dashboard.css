@@ -196,6 +196,109 @@
   .action-btn { width: 40px; height: 40px; }
 }
 
+/* ─── QR MODAL ─── */
+.qr-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.qr-modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px 32px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+
+.qr-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--gray);
+  line-height: 1;
+  padding: 4px;
+}
+
+.qr-modal-title {
+  font-size: 1.3rem;
+  color: var(--gold-dark);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.qr-modal-names {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.qr-modal-toggle {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.qr-modal-btn {
+  padding: 8px 24px;
+  border-radius: 50px;
+  border: 1.5px solid var(--border-light);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: var(--gray);
+  font-family: var(--font-body);
+}
+
+.qr-modal-btn:hover {
+  transform: translateY(-1px);
+}
+
+.qr-modal-btn.active {
+  color: #fff !important;
+}
+
+.qr-modal-code {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.qr-modal-code canvas {
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.qr-modal-label {
+  font-size: 13px;
+  color: var(--gray);
+}
+
+.qr-modal-number {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--gold-dark);
+  letter-spacing: 0.02em;
+}
+
 @media (max-width: 480px) {
   .dashboard-page { padding: 24px 0; }
   .dashboard-header h1 { font-size: 1.3rem; }

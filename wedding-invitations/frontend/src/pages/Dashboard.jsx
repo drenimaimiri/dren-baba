@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiPlus, FiEye, FiEdit2, FiTrash2, FiGlobe, FiCopy } from 'react-icons/fi';
+import { FiPlus, FiEye, FiEdit2, FiTrash2, FiGlobe, FiCopy, FiSmartphone } from 'react-icons/fi';
+import { QRCodeCanvas } from 'qrcode.react';
 import { getMyInvitations, deleteInvitation, publishInvitation } from '../api';
 import './Dashboard.css';
 
@@ -10,6 +11,8 @@ const BASE_URL = import.meta.env.VITE_PUBLIC_URL || window.location.origin;
 export default function Dashboard() {
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [qrInv, setQrInv] = useState(null);
+  const [qrTarget, setQrTarget] = useState('groom');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,6 +123,9 @@ export default function Dashboard() {
                         <FiCopy />
                       </button>
                     )}
+                    <button className="action-btn" onClick={() => { setQrInv(inv); setQrTarget(inv.groomPhone ? 'groom' : 'bride'); }} title="QR kod për WhatsApp">
+                      <FiSmartphone />
+                    </button>
                     <button className="action-btn action-delete" onClick={() => handleDelete(inv._id)} title="Fshij">
                       <FiTrash2 />
                     </button>
@@ -130,6 +136,53 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {qrInv && (
+        <div className="qr-modal-overlay" onClick={() => setQrInv(null)}>
+          <motion.div
+            className="qr-modal"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <button className="qr-modal-close" onClick={() => setQrInv(null)}>&times;</button>
+            <h3 className="qr-modal-title">QR Kod për WhatsApp</h3>
+            <p className="qr-modal-names">{qrInv.groomName} & {qrInv.brideName}</p>
+
+            {qrInv.groomPhone && qrInv.bridePhone && (
+              <div className="qr-modal-toggle">
+                <button
+                  className={`qr-modal-btn ${qrTarget === 'groom' ? 'active' : ''}`}
+                  onClick={() => setQrTarget('groom')}
+                  style={qrTarget === 'groom' ? { background: qrInv.customPrimaryColor || '#D4AF37', borderColor: qrInv.customPrimaryColor || '#D4AF37' } : {}}
+                >
+                  {qrInv.groomName}
+                </button>
+                <button
+                  className={`qr-modal-btn ${qrTarget === 'bride' ? 'active' : ''}`}
+                  onClick={() => setQrTarget('bride')}
+                  style={qrTarget === 'bride' ? { background: qrInv.customPrimaryColor || '#D4AF37', borderColor: qrInv.customPrimaryColor || '#D4AF37' } : {}}
+                >
+                  {qrInv.brideName}
+                </button>
+              </div>
+            )}
+
+            <div className="qr-modal-code">
+              <QRCodeCanvas
+                value={`https://wa.me/${((qrTarget === 'groom' ? qrInv.groomPhone : qrInv.bridePhone) || '').replace(/[^0-9]/g, '')}`}
+                size={200}
+                bgColor="#ffffff"
+                fgColor={qrInv.customPrimaryColor || '#D4AF37'}
+                level="M"
+              />
+              <p className="qr-modal-label">Skano për të dërguar mesazh në WhatsApp</p>
+              <p className="qr-modal-number">{qrTarget === 'groom' ? qrInv.groomPhone : qrInv.bridePhone}</p>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

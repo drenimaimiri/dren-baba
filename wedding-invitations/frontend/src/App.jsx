@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import CreateInvitation from './pages/CreateInvitation';
 import EditInvitation from './pages/EditInvitation';
 import InvitationView from './pages/InvitationView';
+import CreateQR from './pages/CreateQR';
 import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/create" element={<CreateInvitation />} />
         <Route path="/edit/:id" element={<EditInvitation />} />
         <Route path="/invitation/:slug" element={<InvitationView />} />
+        <Route path="/create-qr" element={<CreateQR />} />
         <Route path="/admin" element={user?.role === 'admin' ? <AdminDashboard /> : <Home />} />
       </Routes>
       <Footer />
