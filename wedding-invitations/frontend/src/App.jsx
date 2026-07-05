@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -13,6 +13,8 @@ import CreateQR from './pages/CreateQR';
 import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
+  const location = useLocation();
+  const isInvitationPage = location.pathname.startsWith('/invitation/');
   const user = JSON.parse(localStorage.getItem('user') || 'null');
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem('theme') || 'light';
@@ -29,7 +31,7 @@ export default function App() {
 
   return (
     <>
-      <Navbar theme={theme} toggleTheme={toggleTheme} />
+      {!isInvitationPage && <Navbar theme={theme} toggleTheme={toggleTheme} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -41,7 +43,7 @@ export default function App() {
         <Route path="/create-qr" element={<CreateQR />} />
         <Route path="/admin" element={user?.role === 'admin' ? <AdminDashboard /> : <Home />} />
       </Routes>
-      <Footer />
+      {!isInvitationPage && <Footer />}
     </>
   );
 }
