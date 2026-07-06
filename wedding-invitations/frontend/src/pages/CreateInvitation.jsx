@@ -31,7 +31,7 @@ export default function CreateInvitation() {
     customPrimaryColor: '#D4AF37',
     customSecondaryColor: '#FFF8E7',
     customFont: 'Georgia',
-
+    customMp3Url: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
@@ -267,7 +267,10 @@ export default function CreateInvitation() {
                       <option value="Lora">Lora</option>
                     </select>
                   </div>
-
+                  <div className="form-group">
+                    <label>Linku i Këngës (opsionale)</label>
+                    <input type="text" name="customMp3Url" value={form.customMp3Url} onChange={handleChange} placeholder="/Emri - Kenga.mp3 ose URL e plotë" />
+                  </div>
                 </div>
 
                 <div className="design-preview-box" style={{

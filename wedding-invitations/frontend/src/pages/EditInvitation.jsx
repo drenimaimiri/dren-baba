@@ -15,7 +15,7 @@ export default function EditInvitation() {
     groomName: '', brideName: '', phone: '',
     weddingDate: '', weddingTime: '',
     location: '', locationLat: '', locationLng: '', personalMessage: '',
-    customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7',     customFont: 'Georgia',
+    customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7',     customFont: 'Georgia', customMp3Url: '',
   });
   const [invitation, setInvitation] = useState(null);
 
@@ -45,6 +45,7 @@ export default function EditInvitation() {
         customPrimaryColor: inv.customPrimaryColor,
         customSecondaryColor: inv.customSecondaryColor,
         customFont: inv.customFont,
+        customMp3Url: inv.customMp3Url || '',
 
       });
     } catch (err) {
@@ -194,7 +195,10 @@ export default function EditInvitation() {
                       <option value="Lora">Lora</option>
                     </select>
                   </div>
-
+                  <div className="form-group">
+                    <label>Linku i Këngës (opsionale)</label>
+                    <input type="text" name="customMp3Url" value={form.customMp3Url} onChange={handleChange} placeholder="/Emri - Kenga.mp3 ose URL e plotë" />
+                  </div>
                 </div>
 
                 <div className="design-preview-box" style={{
