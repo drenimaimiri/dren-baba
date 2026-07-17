@@ -66,10 +66,7 @@ export default function EditInvitation() {
   };
 
   const getDefaultSongName = () => {
-    switch (form.invitationType) {
-      case 'syneti': return 'Lavdrim Xhelili - SYNETIA E DJALIT';
-      default: return 'Severina - Rodjeno moje';
-    }
+    return 'Severina - Rodjeno moje';
   };
 
   const togglePreview = () => {
@@ -88,7 +85,7 @@ export default function EditInvitation() {
       window.open(form.customMp3Url, '_blank');
       return;
     } else if (musicSource === 'default') {
-      src = form.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '/Severina - Rodjeno moje.mp3';
+      src = '/Severina - Rodjeno moje.mp3';
     }
     if (!src) return;
     const audio = new Audio(src);

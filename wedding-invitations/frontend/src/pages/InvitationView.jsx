@@ -124,7 +124,7 @@ export default function InvitationView() {
         youTubePlayerRef.current = player;
       });
     } else {
-      const defaultSong = songUrl || (inv.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '/Severina - Rodjeno moje.mp3');
+      const defaultSong = songUrl || '/Severina - Rodjeno moje.mp3';
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;
@@ -216,7 +216,7 @@ export default function InvitationView() {
         });
         return;
       }
-      const defaultSong = songUrl || (inv?.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '/Severina - Rodjeno moje.mp3');
+      const defaultSong = songUrl || '/Severina - Rodjeno moje.mp3';
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;
