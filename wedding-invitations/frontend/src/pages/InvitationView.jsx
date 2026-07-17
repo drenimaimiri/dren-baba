@@ -128,14 +128,22 @@ export default function InvitationView() {
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;
-      audio.play().catch(() => {});
       audioRef.current = audio;
-      setIsMusicPlaying(true);
+      audio.play()
+        .then(() => setIsMusicPlaying(true))
+        .catch(() => setIsMusicPlaying(false));
     }
   }, [inv, loadYouTubeAPI]);
 
   useEffect(() => {
-    if (inv) startMusic();
+    if (!inv) return;
+    const handleInteraction = () => startMusic();
+    document.addEventListener('click', handleInteraction, { once: true });
+    document.addEventListener('touchstart', handleInteraction, { once: true });
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('touchstart', handleInteraction);
+    };
   }, [inv, startMusic]);
 
   const openInvitation = () => {
@@ -212,9 +220,10 @@ export default function InvitationView() {
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;
-      audio.play().catch(() => {});
       audioRef.current = audio;
-      setIsMusicPlaying(true);
+      audio.play()
+        .then(() => setIsMusicPlaying(true))
+        .catch(() => setIsMusicPlaying(false));
       return;
     }
     if (audioRef.current.paused) {
