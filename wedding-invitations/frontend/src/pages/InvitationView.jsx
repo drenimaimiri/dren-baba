@@ -124,8 +124,8 @@ export default function InvitationView() {
         youTubePlayerRef.current = player;
       });
     } else {
-      const isEmanaSyneti = inv.invitationType === 'syneti' && inv.groomName?.trim().toLowerCase() === 'emana';
-      const defaultSong = songUrl || (isEmanaSyneti ? '/Severina - Rodjeno moje.mp3' : '');
+      const isEmaniSyneti = inv.invitationType === 'syneti' && (inv.groomName?.trim().toLowerCase() === 'eman' || inv.groomName?.trim().toLowerCase() === 'emana');
+      const defaultSong = songUrl || (isEmaniSyneti ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '');
       if (!defaultSong) return;
       const audio = new Audio(defaultSong);
       audio.loop = true;
@@ -218,8 +218,8 @@ export default function InvitationView() {
         });
         return;
       }
-      const isEmanaSyneti = inv?.invitationType === 'syneti' && inv?.groomName?.trim().toLowerCase() === 'emana';
-      const defaultSong = songUrl || (isEmanaSyneti ? '/Severina - Rodjeno moje.mp3' : '');
+      const isEmaniSyneti = inv?.invitationType === 'syneti' && (inv?.groomName?.trim().toLowerCase() === 'eman' || inv?.groomName?.trim().toLowerCase() === 'emana');
+      const defaultSong = songUrl || (isEmaniSyneti ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '');
       if (!defaultSong) return;
       const audio = new Audio(defaultSong);
       audio.loop = true;
