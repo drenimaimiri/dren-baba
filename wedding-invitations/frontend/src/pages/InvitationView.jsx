@@ -124,7 +124,7 @@ export default function InvitationView() {
         youTubePlayerRef.current = player;
       });
     } else {
-      const defaultSong = songUrl || (inv.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
+      const defaultSong = songUrl || (inv.invitationType === 'syneti' ? '/Severina - Rodjeno moje.mp3' : inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;

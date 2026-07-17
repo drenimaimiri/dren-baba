@@ -67,7 +67,7 @@ export default function EditInvitation() {
 
   const getDefaultSongName = () => {
     switch (form.invitationType) {
-      case 'syneti': return 'Lavdrim Xhelili - SYNETIA E DJALIT';
+      case 'syneti': return 'Severina - Rodjeno moje';
       case 'kanagjegj': return 'Motrat Mustafa - Kanagjegji (2018)';
       default: return 'Irma Libohova - Martesa Jonë';
     }
@@ -89,7 +89,7 @@ export default function EditInvitation() {
       window.open(form.customMp3Url, '_blank');
       return;
     } else if (musicSource === 'default') {
-      src = form.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : form.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3';
+      src = form.invitationType === 'syneti' ? '/Severina - Rodjeno moje.mp3' : form.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3';
     }
     if (!src) return;
     const audio = new Audio(src);
