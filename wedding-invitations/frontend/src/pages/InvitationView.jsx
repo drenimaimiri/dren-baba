@@ -65,7 +65,7 @@ export default function InvitationView() {
   const openInvitation = () => {
     if (isOpen) return;
     setIsOpen(true);
-    const defaultSong = inv.customMp3Url || (inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
+    const defaultSong = inv.customMp3Url || (inv.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
     const audio = new Audio(defaultSong);
     audio.loop = true;
     audio.volume = 0.4;
