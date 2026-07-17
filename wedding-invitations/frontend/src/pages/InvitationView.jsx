@@ -177,7 +177,46 @@ export default function InvitationView() {
       }
       return;
     }
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      const songUrl = inv?.customMp3Url || '';
+      const youtubeId = extractYouTubeId(songUrl);
+      if (youtubeId) {
+        setIsYouTube(true);
+        loadYouTubeAPI().then((YT) => {
+          const player = new YT.Player('youtube-player', {
+            height: '1',
+            width: '1',
+            videoId: youtubeId,
+            playerVars: {
+              autoplay: 1,
+              loop: 1,
+              playlist: youtubeId,
+              controls: 0,
+              showinfo: 0,
+              modestbranding: 1,
+              rel: 0
+            },
+            events: {
+              onReady: (event) => {
+                event.target.setVolume(40);
+                event.target.playVideo();
+                setIsMusicPlaying(true);
+              }
+            }
+          });
+          youTubePlayerRef.current = player;
+        });
+        return;
+      }
+      const defaultSong = songUrl || (inv?.invitationType === 'syneti' ? '/Severina - Rodjeno moje.mp3' : inv?.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
+      const audio = new Audio(defaultSong);
+      audio.loop = true;
+      audio.volume = 0.4;
+      audio.play().catch(() => {});
+      audioRef.current = audio;
+      setIsMusicPlaying(true);
+      return;
+    }
     if (audioRef.current.paused) {
       audioRef.current.play().catch(() => {});
       setIsMusicPlaying(true);
