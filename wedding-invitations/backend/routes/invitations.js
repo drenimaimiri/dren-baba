@@ -70,6 +70,7 @@ router.post('/', auth, upload.array('photos', 10), async (req, res) => {
       customFont: data.customFont || 'Georgia',
       customMp3Url: data.customMp3Url || '',
       invitationType: data.invitationType || 'dasem',
+      language: data.language || 'sq',
       isPublished: data.isPublished === 'true'
     });
 
@@ -84,7 +85,7 @@ router.put('/:id', auth, upload.array('photos', 10), async (req, res) => {
     const invitation = await Invitation.findOne({ _id: req.params.id, user: req.user._id });
     if (!invitation) return res.status(404).json({ error: 'Invitation not found' });
 
-    const fields = ['groomName', 'brideName', 'groomPhone', 'bridePhone', 'weddingDate', 'weddingTime', 'location', 'locationLat', 'locationLng', 'personalMessage', 'customPrimaryColor', 'customSecondaryColor', 'customFont', 'customMp3Url', 'template', 'invitationType', 'isPublished'];
+    const fields = ['groomName', 'brideName', 'groomPhone', 'bridePhone', 'weddingDate', 'weddingTime', 'location', 'locationLat', 'locationLng', 'personalMessage', 'customPrimaryColor', 'customSecondaryColor', 'customFont', 'customMp3Url', 'template', 'invitationType', 'language', 'isPublished'];
     fields.forEach(f => { if (req.body[f] !== undefined) invitation[f] = req.body[f]; });
 
     if (req.files && req.files.length > 0) {

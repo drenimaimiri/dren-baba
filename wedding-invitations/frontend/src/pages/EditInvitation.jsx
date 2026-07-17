@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiSave, FiEye, FiGlobe, FiSend } from 'react-icons/fi';
+import { FiSave, FiEye, FiGlobe, FiMusic, FiUpload, FiYoutube, FiPlay, FiPause } from 'react-icons/fi';
 import { getMyInvitations, updateInvitation, publishInvitation } from '../api';
 import './CreateInvitation.css';
 
@@ -15,9 +15,13 @@ export default function EditInvitation() {
     groomName: '', brideName: '', phone: '',
     weddingDate: '', weddingTime: '',
     location: '', locationLat: '', locationLng: '', personalMessage: '',
-    customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7',     customFont: 'Georgia', customMp3Url: '',
+    customPrimaryColor: '#D4AF37', customSecondaryColor: '#FFF8E7',     customFont: 'Georgia', customMp3Url: '', language: '',
   });
   const [invitation, setInvitation] = useState(null);
+  const [musicSource, setMusicSource] = useState('default');
+  const [customMp3File, setCustomMp3File] = useState(null);
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const audioPreviewRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,6 +35,13 @@ export default function EditInvitation() {
       const inv = res.data.find(i => i._id === id);
       if (!inv) return navigate('/dashboard');
       setInvitation(inv);
+
+      const existingUrl = inv.customMp3Url || '';
+      const isYoutube = existingUrl && (existingUrl.includes('youtube.com/watch') || existingUrl.includes('youtu.be/'));
+
+      setMusicSource(isYoutube ? 'youtube' : existingUrl ? 'upload' : 'default');
+      setCustomMp3File(null);
+
       setForm({
         invitationType: inv.invitationType || 'dasem',
         groomName: inv.groomName,
@@ -45,11 +56,69 @@ export default function EditInvitation() {
         customPrimaryColor: inv.customPrimaryColor,
         customSecondaryColor: inv.customSecondaryColor,
         customFont: inv.customFont,
-        customMp3Url: inv.customMp3Url || '',
+        customMp3Url: existingUrl,
+        language: inv.language || 'sq',
 
       });
     } catch (err) {
       navigate('/dashboard');
+    }
+  };
+
+  const getDefaultSongName = () => {
+    switch (form.invitationType) {
+      case 'syneti': return 'Lavdrim Xhelili - SYNETIA E DJALIT';
+      case 'kanagjegj': return 'Motrat Mustafa - Kanagjegji (2018)';
+      default: return 'Irma Libohova - Martesa Jonë';
+    }
+  };
+
+  const togglePreview = () => {
+    if (isPreviewPlaying) {
+      if (audioPreviewRef.current) {
+        audioPreviewRef.current.pause();
+        audioPreviewRef.current = null;
+      }
+      setIsPreviewPlaying(false);
+      return;
+    }
+    let src = '';
+    if (musicSource === 'upload' && customMp3File) {
+      src = URL.createObjectURL(customMp3File);
+    } else if (musicSource === 'youtube' && form.customMp3Url) {
+      window.open(form.customMp3Url, '_blank');
+      return;
+    } else if (musicSource === 'default') {
+      src = form.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : form.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3';
+    }
+    if (!src) return;
+    const audio = new Audio(src);
+    audio.volume = 0.3;
+    audio.play().catch(() => {});
+    audio.onended = () => setIsPreviewPlaying(false);
+    audioPreviewRef.current = audio;
+    setIsPreviewPlaying(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioPreviewRef.current) {
+        audioPreviewRef.current.pause();
+        audioPreviewRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleMusicSourceChange = (source) => {
+    if (audioPreviewRef.current) {
+      audioPreviewRef.current.pause();
+      audioPreviewRef.current = null;
+      setIsPreviewPlaying(false);
+    }
+    setMusicSource(source);
+    if (source === 'default') {
+      setCustomMp3File(null);
+      setForm(prev => ({ ...prev, customMp3Url: '' }));
     }
   };
 
@@ -72,10 +141,18 @@ export default function EditInvitation() {
           } else {
             fd.append('groomPhone', form[key]);
           }
+        } else if (key === 'customMp3Url' && musicSource !== 'youtube') {
+          return;
         } else {
           fd.append(key, form[key]);
         }
       });
+      if (musicSource === 'default') {
+        fd.set('customMp3Url', '');
+      }
+      if (customMp3File) {
+        fd.append('customMp3File', customMp3File);
+      }
       await updateInvitation(id, fd);
       alert('Ftesa u përditësua me sukses!');
     } catch (err) {
@@ -177,6 +254,14 @@ export default function EditInvitation() {
                 <label>Numri i Telefonit për Konfirmim</label>
                 <input type="tel" name="phone" value={form.phone} onChange={handleChange} placeholder="+383 4X XXX XXX" />
               </div>
+              <div className="form-group">
+                <label><FiGlobe /> Gjuha / Language / Jezik</label>
+                <select name="language" value={form.language} onChange={handleChange} className="language-select">
+                  <option value="sq">Shqip</option>
+                  <option value="en">English</option>
+                  <option value="sr">Srpski</option>
+                </select>
+              </div>
               <div className="form-row">
                 <div className="form-group">
                   <label>Latitude</label>
@@ -219,8 +304,75 @@ export default function EditInvitation() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Linku i Këngës (opsionale)</label>
-                    <input type="text" name="customMp3Url" value={form.customMp3Url} onChange={handleChange} placeholder="/Emri - Kenga.mp3 ose URL e plotë" />
+                    <label><FiMusic /> Muzika (opsionale)</label>
+                    <div className="music-source-selector">
+                      <button
+                        type="button"
+                        className={`music-source-btn ${musicSource === 'default' ? 'active' : ''}`}
+                        onClick={() => handleMusicSourceChange('default')}
+                      >
+                        <FiMusic /> Parazgjedhur
+                      </button>
+                      <button
+                        type="button"
+                        className={`music-source-btn ${musicSource === 'upload' ? 'active' : ''}`}
+                        onClick={() => handleMusicSourceChange('upload')}
+                      >
+                        <FiUpload /> Ngarko MP3
+                      </button>
+                      <button
+                        type="button"
+                        className={`music-source-btn ${musicSource === 'youtube' ? 'active' : ''}`}
+                        onClick={() => handleMusicSourceChange('youtube')}
+                      >
+                        <FiYoutube /> YouTube
+                      </button>
+                    </div>
+
+                    <div className="music-source-content">
+                      {musicSource === 'default' && (
+                        <div className="music-default-info">
+                          <p>Do të përdoret kënga parazgjedhur për <strong>{form.invitationType === 'dasem' ? 'dasëm' : form.invitationType === 'kanagjegj' ? 'kanagjegj' : 'synet'}</strong>:</p>
+                          <p className="music-default-name">♫ {getDefaultSongName()}</p>
+                        </div>
+                      )}
+
+                      {musicSource === 'upload' && (
+                        <div className="music-upload-area">
+                          <input
+                            type="file"
+                            accept=".mp3,audio/*"
+                            onChange={(e) => setCustomMp3File(e.target.files[0] || null)}
+                            className="music-file-input"
+                            id="mp3-upload-edit"
+                          />
+                          <label htmlFor="mp3-upload-edit" className="music-upload-label">
+                            <FiUpload />
+                            {customMp3File ? customMp3File.name : 'Zgjidhni një skedar MP3'}
+                          </label>
+                        </div>
+                      )}
+
+                      {musicSource === 'youtube' && (
+                        <input
+                          type="text"
+                          name="customMp3Url"
+                          value={form.customMp3Url}
+                          onChange={handleChange}
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          className="music-youtube-input"
+                        />
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="music-preview-btn"
+                      onClick={togglePreview}
+                      disabled={musicSource === 'default' && false || (musicSource === 'upload' && !customMp3File) || (musicSource === 'youtube' && !form.customMp3Url)}
+                    >
+                      {isPreviewPlaying ? <><FiPause /> Ndalo</> : <><FiPlay /> Dëgjo</>}
+                    </button>
                   </div>
                 </div>
 

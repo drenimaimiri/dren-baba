@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,11 +28,40 @@ export default function InvitationView() {
   const [qrTarget, setQrTarget] = useState('groom');
   const [langOpen, setLangOpen] = useState(false);
   const audioRef = useRef(null);
+  const youTubePlayerRef = useRef(null);
   const contentRef = useRef(null);
+  const [isYouTube, setIsYouTube] = useState(false);
+
+  const extractYouTubeId = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const loadYouTubeAPI = useCallback(() => {
+    return new Promise((resolve) => {
+      if (window.YT && window.YT.Player) {
+        resolve(window.YT);
+        return;
+      }
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      window.onYouTubeIframeAPIReady = () => resolve(window.YT);
+    });
+  }, []);
 
   useEffect(() => {
     loadInvitation();
   }, [slug]);
+
+  useEffect(() => {
+    if (inv?.language) {
+      i18n.changeLanguage(inv.language);
+    }
+  }, [inv?.language]);
 
   useEffect(() => {
     if (!inv?.weddingDate) return;
@@ -65,13 +94,49 @@ export default function InvitationView() {
   const openInvitation = () => {
     if (isOpen) return;
     setIsOpen(true);
-    const defaultSong = inv.customMp3Url || (inv.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
-    const audio = new Audio(defaultSong);
-    audio.loop = true;
-    audio.volume = 0.4;
-    audio.play().catch(() => {});
-    audioRef.current = audio;
-    setIsMusicPlaying(true);
+
+    const songUrl = inv.customMp3Url || '';
+    const youtubeId = extractYouTubeId(songUrl);
+
+    if (youtubeId) {
+      setIsYouTube(true);
+      loadYouTubeAPI().then((YT) => {
+        if (youTubePlayerRef.current) {
+          youTubePlayerRef.current.destroy();
+        }
+        const player = new YT.Player('youtube-player', {
+          height: '1',
+          width: '1',
+          videoId: youtubeId,
+          playerVars: {
+            autoplay: 1,
+            loop: 1,
+            playlist: youtubeId,
+            controls: 0,
+            showinfo: 0,
+            modestbranding: 1,
+            rel: 0
+          },
+          events: {
+            onReady: (event) => {
+              event.target.setVolume(40);
+              event.target.playVideo();
+              setIsMusicPlaying(true);
+            }
+          }
+        });
+        youTubePlayerRef.current = player;
+      });
+    } else {
+      const defaultSong = songUrl || (inv.invitationType === 'syneti' ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : inv.invitationType === 'kanagjegj' ? '/Motrat Mustafa - Kanagjegji (2018).mp3' : '/Irma Libohova - Martesa Jonë.mp3');
+      const audio = new Audio(defaultSong);
+      audio.loop = true;
+      audio.volume = 0.4;
+      audio.play().catch(() => {});
+      audioRef.current = audio;
+      setIsMusicPlaying(true);
+    }
+
     setTimeout(() => {
       setShowContent(true);
       setTimeout(() => {
@@ -93,6 +158,16 @@ export default function InvitationView() {
   }, [inv]);
 
   const toggleMusic = () => {
+    if (isYouTube && youTubePlayerRef.current) {
+      if (isMusicPlaying) {
+        youTubePlayerRef.current.pauseVideo();
+        setIsMusicPlaying(false);
+      } else {
+        youTubePlayerRef.current.playVideo();
+        setIsMusicPlaying(true);
+      }
+      return;
+    }
     if (!audioRef.current) return;
     if (audioRef.current.paused) {
       audioRef.current.play().catch(() => {});
@@ -108,6 +183,10 @@ export default function InvitationView() {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
+      }
+      if (youTubePlayerRef.current) {
+        youTubePlayerRef.current.destroy();
+        youTubePlayerRef.current = null;
       }
     };
   }, []);
@@ -488,6 +567,8 @@ export default function InvitationView() {
           </button>
         ))}
       </div>
+
+      <div id="youtube-player" style={{ position: 'fixed', bottom: -9999, left: -9999, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}></div>
 
       <button
         className={`music-btn${isMusicPlaying ? ' playing' : ''}`}

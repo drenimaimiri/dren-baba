@@ -19,6 +19,7 @@ const invitationSchema = new mongoose.Schema({
   customFont: { type: String, default: 'Georgia' },
   customMp3Url: { type: String, default: '' },
   invitationType: { type: String, enum: ['dasem', 'kanagjegj', 'syneti'], default: 'dasem' },
+  language: { type: String, enum: ['sq', 'en', 'sr'], default: 'sq' },
   slug: { type: String, unique: true },
   isPublished: { type: Boolean, default: false },
   rsvpList: [{
