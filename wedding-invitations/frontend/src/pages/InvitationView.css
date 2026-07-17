@@ -1208,3 +1208,56 @@
   .qr-code-box { padding: 14px; }
   .qr-code-box canvas { width: 120px !important; height: 120px !important; }
 }
+
+.inv-lang-bar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  padding: 4px;
+  border-radius: 50px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid rgba(201,168,76,0.15);
+}
+
+.inv-lang-btn {
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray);
+  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+}
+
+.inv-lang-btn:hover {
+  color: var(--gold-dark);
+  background: rgba(201,168,76,0.08);
+}
+
+.inv-lang-btn.active {
+  background: var(--gold);
+  color: white;
+  box-shadow: 0 2px 8px rgba(201,168,76,0.25);
+}
+
+@media (max-width: 768px) {
+  .inv-lang-bar {
+    top: 12px;
+    right: 12px;
+    gap: 3px;
+    padding: 3px;
+  }
+  .inv-lang-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}

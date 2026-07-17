@@ -71,7 +71,13 @@ export default function CreateInvitation() {
       const fd = new FormData();
       Object.keys(form).forEach(key => {
         if (key === 'phone') {
-          fd.append(form.invitationType === 'kanagjegj' ? 'bridePhone' : 'groomPhone', form[key]);
+          if (form.invitationType === 'kanagjegj') {
+            fd.append('bridePhone', form[key]);
+          } else if (form.invitationType === 'syneti') {
+            fd.append('groomPhone', form[key]);
+          } else {
+            fd.append('groomPhone', form[key]);
+          }
         } else {
           fd.append(key, form[key]);
         }
@@ -139,6 +145,14 @@ export default function CreateInvitation() {
                   <h3>Kanagjegj</h3>
                   <p>Ftesë për natën e kanagjegjit</p>
                 </div>
+                <div
+                  className={`type-select-card ${form.invitationType === 'syneti' ? 'selected' : ''}`}
+                  onClick={() => setForm(prev => ({ ...prev, invitationType: 'syneti' }))}
+                >
+                  <div className="type-select-icon">✨</div>
+                  <h3>Synet</h3>
+                  <p>Ftesë për synetin e djalit</p>
+                </div>
               </div>
               <div className="step-buttons">
                 <button type="button" className="btn btn-gold" onClick={() => goToStep(1)}>
@@ -188,23 +202,32 @@ export default function CreateInvitation() {
 
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-              <h2 className="step-title">{form.invitationType === 'kanagjegj' ? 'Detajet e Kanagjegjit' : 'Detajet e Dasmës'}</h2>
+              <h2 className="step-title">{form.invitationType === 'kanagjegj' ? 'Detajet e Kanagjegjit' : form.invitationType === 'syneti' ? 'Detajet e Synetit' : 'Detajet e Dasmës'}</h2>
               <div className="create-form">
                 <div className="form-row">
-                  {form.invitationType !== 'kanagjegj' && (
+                  {form.invitationType === 'syneti' ? (
                     <div className="form-group">
-                      <label>Emri i Dhëndrit</label>
-                      <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required={form.invitationType !== 'kanagjegj'} placeholder="Shkruaj emrin e dhëndrit" />
+                      <label>Emri i Djalit</label>
+                      <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required placeholder="Shkruaj emrin e djalit" />
                     </div>
+                  ) : (
+                    <>
+                      {form.invitationType !== 'kanagjegj' && (
+                        <div className="form-group">
+                          <label>Emri i Dhëndrit</label>
+                          <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required={form.invitationType !== 'kanagjegj'} placeholder="Shkruaj emrin e dhëndrit" />
+                        </div>
+                      )}
+                      <div className="form-group">
+                        <label>Emri i Nuses</label>
+                        <input type="text" name="brideName" value={form.brideName} onChange={handleChange} required placeholder="Shkruaj emrin e nuses" />
+                      </div>
+                    </>
                   )}
-                  <div className="form-group">
-                    <label>Emri i Nuses</label>
-                    <input type="text" name="brideName" value={form.brideName} onChange={handleChange} required placeholder="Shkruaj emrin e nuses" />
-                  </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label><FiClock /> {form.invitationType === 'kanagjegj' ? 'Data e Kanagjegjit' : 'Data e Dasmës'}</label>
+                    <label><FiClock /> {form.invitationType === 'kanagjegj' ? 'Data e Kanagjegjit' : form.invitationType === 'syneti' ? 'Data e Synetit' : 'Data e Dasmës'}</label>
                     <input type="date" name="weddingDate" value={form.weddingDate} onChange={handleChange} required />
                   </div>
                   <div className="form-group">
@@ -281,6 +304,8 @@ export default function CreateInvitation() {
                   <div className="preview-couple">
                     {form.invitationType === 'kanagjegj' ? (
                       <span>{form.brideName || 'Nusja'}</span>
+                    ) : form.invitationType === 'syneti' ? (
+                      <span>{form.groomName || 'Djali'}</span>
                     ) : (
                       <>
                         <span>{form.groomName || 'Dhëndri'}</span>
@@ -321,7 +346,7 @@ export default function CreateInvitation() {
                 exit={{ opacity: 0, scale: 0.8, y: 30 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               >
-                <div className="success-icon">💍</div>
+                <div className="success-icon">{form.invitationType === 'syneti' ? '✨' : '💍'}</div>
                 <h2>Ftesa u krijua me sukses!</h2>
                 <p>Linku i ftesës suaj:</p>
                 <div className="success-link-box">

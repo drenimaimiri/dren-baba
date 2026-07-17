@@ -96,14 +96,16 @@ export default function Dashboard() {
                   <div className="inv-card-names">
                     {inv.invitationType === 'kanagjegj' ? (
                       <h3>{inv.brideName}</h3>
+                    ) : inv.invitationType === 'syneti' ? (
+                      <h3>{inv.groomName}</h3>
                     ) : (
                       <><h3>{inv.groomName}</h3>
                         <span className="inv-card-ampersand">&</span>
                         <h3>{inv.brideName}</h3></>
                     )}
                   </div>
-                  <div className="inv-card-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : '#D4AF37' }}>
-                    {inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : 'Dasëm'}
+                  <div className="inv-card-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : inv.invitationType === 'syneti' ? '#10B981' : '#D4AF37' }}>
+                    {inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : inv.invitationType === 'syneti' ? 'Synet' : 'Dasëm'}
                   </div>
                   <div className={`inv-card-status ${inv.isPublished ? 'published' : 'draft'}`}>
                     {inv.isPublished ? 'Publikuar' : 'Draft'}
@@ -155,10 +157,12 @@ export default function Dashboard() {
           >
             <button className="qr-modal-close" onClick={() => setQrInv(null)}>&times;</button>
             <h3 className="qr-modal-title">QR Kod për WhatsApp</h3>
-            <p className="qr-modal-names">{qrInv.invitationType === 'kanagjegj' ? qrInv.brideName : `${qrInv.groomName} & ${qrInv.brideName}`}</p>
+            <p className="qr-modal-names">{qrInv.invitationType === 'kanagjegj' ? qrInv.brideName : qrInv.invitationType === 'syneti' ? qrInv.groomName : `${qrInv.groomName} & ${qrInv.brideName}`}</p>
 
             {qrInv.invitationType === 'kanagjegj' ? (
               <p className="qr-modal-label" style={{ marginBottom: 20 }}>{qrInv.brideName}</p>
+            ) : qrInv.invitationType === 'syneti' ? (
+              <p className="qr-modal-label" style={{ marginBottom: 20 }}>{qrInv.groomName}</p>
             ) : qrInv.groomPhone && qrInv.bridePhone ? (
               <div className="qr-modal-toggle">
                 <button

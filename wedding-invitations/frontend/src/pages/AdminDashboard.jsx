@@ -151,9 +151,9 @@ export default function AdminDashboard() {
               <tbody>
                 {invitations.map(inv => (
                   <tr key={inv._id}>
-                    <td><strong>{inv.invitationType === 'kanagjegj' ? inv.brideName : `${inv.groomName} & ${inv.brideName}`}</strong></td>
+                    <td><strong>{inv.invitationType === 'kanagjegj' ? inv.brideName : inv.invitationType === 'syneti' ? inv.groomName : `${inv.groomName} & ${inv.brideName}`}</strong></td>
                     <td>{inv.user?.name || 'N/A'}</td>
-                    <td><span className="admin-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : '#D4AF37' }}>{inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : 'Dasëm'}</span></td>
+                    <td><span className="admin-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : inv.invitationType === 'syneti' ? '#10B981' : '#D4AF37' }}>{inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : inv.invitationType === 'syneti' ? 'Synet' : 'Dasëm'}</span></td>
                     <td>{new Date(inv.weddingDate).toLocaleDateString('sq-AL')}</td>
                     <td><span className={`status-badge ${inv.isPublished ? 'published' : 'draft'}`}>{inv.isPublished ? 'Publik' : 'Draft'}</span></td>
                     <td>{inv.rsvpList?.length || 0}</td>

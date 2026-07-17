@@ -1,12 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiHeart, FiMapPin, FiClock, FiCalendar, FiPhone, FiMessageSquare } from 'react-icons/fi';
+import { FiHeart, FiMapPin, FiClock, FiCalendar, FiPhone, FiMessageSquare, FiGlobe } from 'react-icons/fi';
 import { getPublicInvitation } from '../api';
 import { QRCodeCanvas } from 'qrcode.react';
+import '../i18n';
 import './InvitationView.css';
 
+const languages = [
+  { code: 'sq', label: 'Shqip' },
+  { code: 'en', label: 'English' },
+  { code: 'sr', label: 'Srpski' },
+];
+
 export default function InvitationView() {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
   const [inv, setInv] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,6 +26,7 @@ export default function InvitationView() {
   const [showContent, setShowContent] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [qrTarget, setQrTarget] = useState('groom');
+  const [langOpen, setLangOpen] = useState(false);
   const audioRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -46,7 +56,7 @@ export default function InvitationView() {
       const res = await getPublicInvitation(slug);
       setInv(res.data);
     } catch (err) {
-      setError('Ftesa nuk u gjet.');
+      setError(t('invitation.notFound'));
     } finally {
       setLoading(false);
     }
@@ -72,7 +82,9 @@ export default function InvitationView() {
 
   useEffect(() => {
     if (inv) {
-      if (!inv.groomPhone && inv.bridePhone) {
+      if (inv.invitationType === 'syneti') {
+        setQrTarget('groom');
+      } else if (!inv.groomPhone && inv.bridePhone) {
         setQrTarget('bride');
       } else {
         setQrTarget('groom');
@@ -100,7 +112,7 @@ export default function InvitationView() {
     };
   }, []);
 
-  if (loading) return <div className="inv-loading">Duke ngarkuar...</div>;
+  if (loading) return <div className="inv-loading">{t('invitation.loading')}</div>;
   if (error) return <div className="inv-loading">{error}</div>;
   if (!inv) return null;
 
@@ -113,6 +125,46 @@ export default function InvitationView() {
   const effectiveTarget = !groomPhone ? 'bride' : qrTarget;
   const qrNumber = effectiveTarget === 'groom' ? groomPhone : bridePhone;
   const waNumber = (qrNumber || '').replace(/[^0-9]/g, '');
+  const locale = i18n.language === 'sq' ? 'sq-AL' : i18n.language === 'sr' ? 'sr-RS' : 'en-US';
+
+  const getEnvelopeText = () => {
+    switch (inv.invitationType) {
+      case 'kanagjegj': return t('invitation.envelopeKanagjegj');
+      case 'syneti': return t('invitation.envelopeSynet');
+      default: return t('invitation.envelopeWedding');
+    }
+  };
+
+  const getEnvelopeTitle = () => {
+    switch (inv.invitationType) {
+      case 'kanagjegj': return t('invitation.envelopeTitleKanagjegj');
+      case 'syneti': return t('invitation.envelopeTitleSynet');
+      default: return t('invitation.envelopeTitleWedding');
+    }
+  };
+
+  const getSubtitle = () => {
+    switch (inv.invitationType) {
+      case 'kanagjegj': return t('invitation.subtitleKanagjegj');
+      case 'syneti': return t('invitation.subtitleSynet');
+      default: return t('invitation.subtitleWedding');
+    }
+  };
+
+  const getGallerySubtitle = () => {
+    switch (inv.invitationType) {
+      case 'kanagjegj': return t('invitation.gallerySubtitleKanagjegj');
+      case 'syneti': return t('invitation.gallerySubtitleSynet');
+      default: return t('invitation.gallerySubtitleWedding');
+    }
+  };
+
+  const countdownLabels = [
+    { label: t('invitation.countdownDays'), value: timeLeft.days || 0 },
+    { label: t('invitation.countdownHours'), value: timeLeft.hours || 0 },
+    { label: t('invitation.countdownMinutes'), value: timeLeft.minutes || 0 },
+    { label: t('invitation.countdownSeconds'), value: timeLeft.seconds || 0 }
+  ];
 
   return (
     <div className="invitation-view" style={{ fontFamily }}>
@@ -142,18 +194,18 @@ export default function InvitationView() {
                 <div className="envelope-flap">
                   <div className="envelope-flap-inner"></div>
                 </div>
-                <div className="envelope-seal">{inv.invitationType === 'kanagjegj' ? inv.brideName?.charAt(0) : `${inv.groomName?.charAt(0)}${inv.brideName?.charAt(0)}`}</div>
+                <div className="envelope-seal">{inv.invitationType === 'kanagjegj' ? inv.brideName?.charAt(0) : inv.invitationType === 'syneti' ? inv.groomName?.charAt(0) : `${inv.groomName?.charAt(0)}${inv.brideName?.charAt(0)}`}</div>
                 <div className="env-invitation-card">
                   <div className="env-card-heart">✧</div>
-                  <div className="env-card-names">{inv.invitationType === 'kanagjegj' ? inv.brideName : <>{inv.groomName} <span>&</span> {inv.brideName}</>}</div>
+                  <div className="env-card-names">{inv.invitationType === 'kanagjegj' ? inv.brideName : inv.invitationType === 'syneti' ? inv.groomName : <>{inv.groomName} <span>&</span> {inv.brideName}</>}</div>
                   <div className="env-card-line"></div>
-                  <div className="env-card-text">{inv.invitationType === 'kanagjegj' ? 'Bashkohuni me ne në këtë natë të veçantë' : 'Bashkohuni me ne në këtë ditë të veçantë'}</div>
-                  <div className="env-card-date">{weddingDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                  <div className="env-card-sub">{inv.invitationType === 'kanagjegj' ? 'Kanagjegji Jonë' : 'Dasma Jonë'}</div>
+                  <div className="env-card-text">{getEnvelopeText()}</div>
+                  <div className="env-card-date">{weddingDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                  <div className="env-card-sub">{getEnvelopeTitle()}</div>
                 </div>
                 <div className="envelope-shadow"></div>
               </div>
-              {!isOpen && <p className="click-hint">Klikoni për të hapur</p>}
+              {!isOpen && <p className="click-hint">{t('invitation.clickToOpen')}</p>}
             </div>
           </motion.section>
         ) : (
@@ -179,16 +231,18 @@ export default function InvitationView() {
               <h1 className="inv-couple-names">
                 {inv.invitationType === 'kanagjegj' ? (
                   <span>{inv.brideName}</span>
+                ) : inv.invitationType === 'syneti' ? (
+                  <span>{inv.groomName}</span>
                 ) : (
                   <><span>{inv.groomName}</span>
                     <span className="inv-ampersand" style={{ color: primaryColor }}>&</span>
                     <span>{inv.brideName}</span></>
                 )}
               </h1>
-              <p className="inv-hero-subtitle">{inv.invitationType === 'kanagjegj' ? 'Ju fton në kanagjegjin e saj' : 'Ju ftojnë në dasmën e tyre'}</p>
+              <p className="inv-hero-subtitle">{getSubtitle()}</p>
               <div className="inv-hero-date">
                 <FiCalendar style={{ color: primaryColor }} />
-                {weddingDate.toLocaleDateString('sq-AL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                {weddingDate.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
               </div>
               <div className="inv-hero-ornament" style={{ color: primaryColor }}>✦ ✦ ✦</div>
             </div>
@@ -202,15 +256,10 @@ export default function InvitationView() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                 >
-                  Mbetën
+                  {t('invitation.countdownTitle')}
                 </motion.h2>
                 <div className="countdown-grid">
-                  {[
-                    { label: 'Ditë', value: timeLeft.days || 0 },
-                    { label: 'Orë', value: timeLeft.hours || 0 },
-                    { label: 'Minuta', value: timeLeft.minutes || 0 },
-                    { label: 'Sekonda', value: timeLeft.seconds || 0 }
-                  ].map((item, i) => (
+                  {countdownLabels.map((item, i) => (
                     <motion.div
                       key={i}
                       className="countdown-item"
@@ -237,19 +286,19 @@ export default function InvitationView() {
                 >
                   <div className="inv-detail-item">
                     <FiCalendar style={{ color: primaryColor }} />
-                    <h3>Data</h3>
-                    <p>{weddingDate.toLocaleDateString('sq-AL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <h3>{t('invitation.dateLabel')}</h3>
+                    <p>{weddingDate.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                   </div>
                   <div className="inv-detail-divider" style={{ background: primaryColor }} />
                   <div className="inv-detail-item">
                     <FiClock style={{ color: primaryColor }} />
-                    <h3>Ora</h3>
+                    <h3>{t('invitation.timeLabel')}</h3>
                     <p>{inv.weddingTime}</p>
                   </div>
                   <div className="inv-detail-divider" style={{ background: primaryColor }} />
                   <div className="inv-detail-item">
                     <FiMapPin style={{ color: primaryColor }} />
-                    <h3>Lokacioni</h3>
+                    <h3>{t('invitation.locationLabel')}</h3>
                     <p>{inv.location}</p>
                   </div>
                 </motion.div>
@@ -282,9 +331,9 @@ export default function InvitationView() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                   >
-                    Galeria
+                    {t('invitation.galleryTitle')}
                   </motion.h2>
-                  <p className="inv-section-subtitle">{inv.invitationType === 'kanagjegj' ? 'Momente të bukura nga nata e kanagjegjit' : 'Momente të bukura nga dashuria juaj'}</p>
+                  <p className="inv-section-subtitle">{getGallerySubtitle()}</p>
                   <div className="inv-gallery">
                     {inv.photos.map((photo, i) => (
                       <motion.div
@@ -313,7 +362,7 @@ export default function InvitationView() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                   >
-                    Lokacioni
+                    {t('invitation.mapTitle')}
                   </motion.h2>
                   <motion.div
                     className="inv-map-container"
@@ -344,9 +393,9 @@ export default function InvitationView() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                   >
-                    <h2 className="inv-section-title">Konfirmoni Ardhjen Tuaj</h2>
+                    <h2 className="inv-section-title">{t('invitation.confirmTitle')}</h2>
                     <p className="inv-section-subtitle">
-                      Ju lutemi na njoftoni për pjesëmarrjen tuaj duke na kontaktuar në numrin më poshtë.
+                      {t('invitation.confirmDesc')}
                     </p>
 
                     <div className="contact-single">
@@ -370,8 +419,8 @@ export default function InvitationView() {
 
                     {waNumber && (
                       <div className="qr-section">
-                        <div className="qr-divider"><span style={{ color: primaryColor }}>ose</span></div>
-                        <h3 className="qr-title">Skanoni QR kod për WhatsApp</h3>
+                        <div className="qr-divider"><span style={{ color: primaryColor }}>{t('invitation.qrOr')}</span></div>
+                        <h3 className="qr-title">{t('invitation.qrTitle')}</h3>
                         {hasBothPhones && (
                           <div className="qr-toggle">
                             <button
@@ -399,7 +448,7 @@ export default function InvitationView() {
                             level="M"
                             style={{ borderRadius: 12 }}
                           />
-                          <p className="qr-label">Skano për të dërguar mesazh</p>
+                          <p className="qr-label">{t('invitation.qrLabel')}</p>
                         </div>
                       </div>
                     )}
@@ -413,13 +462,13 @@ export default function InvitationView() {
                 <div className="inv-footer-content">
                   <FiHeart style={{ fontSize: '2rem', color: 'white', opacity: 0.8 }} />
                   <h2 style={{ color: 'white', fontFamily: 'Great Vibes, cursive', fontSize: '2rem' }}>
-                    {inv.invitationType === 'kanagjegj' ? inv.brideName : `${inv.groomName} & ${inv.brideName}`}
+                    {inv.invitationType === 'kanagjegj' ? inv.brideName : inv.invitationType === 'syneti' ? inv.groomName : `${inv.groomName} & ${inv.brideName}`}
                   </h2>
                   <p style={{ color: 'rgba(255,255,255,0.8)' }}>
-                    {weddingDate.toLocaleDateString('sq-AL', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    {weddingDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
                   <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginTop: 20 }}>
-                    Krijuar me ❤ nga FtesaDasme
+                    {t('app.footerCredit')}
                   </p>
                 </div>
               </div>
@@ -427,6 +476,18 @@ export default function InvitationView() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div className="inv-lang-bar">
+        {languages.map(l => (
+          <button
+            key={l.code}
+            className={`inv-lang-btn ${l.code === i18n.language ? 'active' : ''}`}
+            onClick={() => i18n.changeLanguage(l.code)}
+          >
+            {l.label}
+          </button>
+        ))}
+      </div>
 
       <button
         className={`music-btn${isMusicPlaying ? ' playing' : ''}`}
