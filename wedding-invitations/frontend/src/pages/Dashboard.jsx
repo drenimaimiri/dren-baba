@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiPlus, FiEye, FiEdit2, FiTrash2, FiGlobe, FiCopy, FiSmartphone } from 'react-icons/fi';
 import { QRCodeCanvas } from 'qrcode.react';
-import { getMyInvitations, deleteInvitation, publishInvitation } from '../api';
+import { getMyInvitations, deleteInvitation, publishInvitation, resetAllMusic } from '../api';
 import './Dashboard.css';
 
 const BASE_URL = import.meta.env.VITE_PUBLIC_URL || window.location.origin;
@@ -51,6 +51,16 @@ export default function Dashboard() {
     }
   };
 
+  const handleResetMusic = async () => {
+    if (!window.confirm('A jeni të sigurt që doni t\'i ktheni të gjitha muzikat në default?')) return;
+    try {
+      const res = await resetAllMusic();
+      alert(res.data.message);
+    } catch (err) {
+      alert('Error: ' + (err.response?.data?.error || 'Something went wrong'));
+    }
+  };
+
   const copyLink = (slug) => {
     navigator.clipboard.writeText(`${BASE_URL}/invitation/${slug}`);
     alert('Linku u kopjua!');
@@ -66,9 +76,14 @@ export default function Dashboard() {
             <h1>Ftesat e Mia</h1>
             <p>Menaxho të gjitha ftesat e tua të dasmës</p>
           </div>
-          <Link to="/create" className="btn btn-gold">
-            <FiPlus /> Krijo Ftesë të Re
-          </Link>
+          <div className="dashboard-header-actions">
+            <Link to="/create" className="btn btn-gold">
+              <FiPlus /> Krijo Ftesë të Re
+            </Link>
+            <button className="btn btn-outline" onClick={handleResetMusic} style={{ marginLeft: 10 }}>
+              Ktheji Muzikat në Default
+            </button>
+          </div>
         </div>
 
         {invitations.length === 0 ? (

@@ -34,6 +34,7 @@ export const createInvitation = (data) => API.post('/invitations', data, { heade
 export const updateInvitation = (id, data) => API.put(`/invitations/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } });
 export const deleteInvitation = (id) => API.delete(`/invitations/${id}`);
 export const publishInvitation = (id, publish) => API.patch(`/invitations/${id}/publish`, { publish });
+export const resetAllMusic = () => API.patch('/invitations/reset-music');
 export const submitRsvp = (id, data) => API.post(`/invitations/${id}/rsvp`, data);
 
 export const getAdminUsers = () => API.get('/admin/users');

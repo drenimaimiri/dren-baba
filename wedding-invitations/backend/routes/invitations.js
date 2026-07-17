@@ -129,6 +129,18 @@ router.post('/:id/rsvp', async (req, res) => {
   }
 });
 
+router.patch('/reset-music', auth, async (req, res) => {
+  try {
+    const result = await Invitation.updateMany(
+      { user: req.user._id },
+      { $set: { customMp3Url: '' } }
+    );
+    res.json({ message: `Muzika u kthye ne default per ${result.modifiedCount} ftesa.` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.patch('/:id/publish', auth, async (req, res) => {
   try {
     const invitation = await Invitation.findOneAndUpdate(
