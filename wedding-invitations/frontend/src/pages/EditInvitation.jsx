@@ -66,7 +66,7 @@ export default function EditInvitation() {
   };
 
   const getDefaultSongName = () => {
-    return 'Severina - Rodjeno moje';
+    return 'Pa muzike (default)';
   };
 
   const togglePreview = () => {
@@ -85,7 +85,7 @@ export default function EditInvitation() {
       window.open(form.customMp3Url, '_blank');
       return;
     } else if (musicSource === 'default') {
-      src = '/Severina - Rodjeno moje.mp3';
+      src = '';
     }
     if (!src) return;
     const audio = new Audio(src);
@@ -328,8 +328,8 @@ export default function EditInvitation() {
                     <div className="music-source-content">
                       {musicSource === 'default' && (
                         <div className="music-default-info">
-                          <p>Do të përdoret kënga parazgjedhur për <strong>{form.invitationType === 'dasem' ? 'dasëm' : form.invitationType === 'kanagjegj' ? 'kanagjegj' : 'synet'}</strong>:</p>
-                          <p className="music-default-name">♫ {getDefaultSongName()}</p>
+                          <p>Pa muzikë të parazgjedhur. Mund të ngarkoni një këngë ose të vendosni një link të YouTube.</p>
+                          <p className="music-default-name">{getDefaultSongName()}</p>
                         </div>
                       )}
 

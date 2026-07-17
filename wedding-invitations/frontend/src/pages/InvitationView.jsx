@@ -124,7 +124,9 @@ export default function InvitationView() {
         youTubePlayerRef.current = player;
       });
     } else {
-      const defaultSong = songUrl || '/Severina - Rodjeno moje.mp3';
+      const isEmanaSyneti = inv.invitationType === 'syneti' && inv.groomName?.trim().toLowerCase() === 'emana';
+      const defaultSong = songUrl || (isEmanaSyneti ? '/Severina - Rodjeno moje.mp3' : '');
+      if (!defaultSong) return;
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;
@@ -216,7 +218,9 @@ export default function InvitationView() {
         });
         return;
       }
-      const defaultSong = songUrl || '/Severina - Rodjeno moje.mp3';
+      const isEmanaSyneti = inv?.invitationType === 'syneti' && inv?.groomName?.trim().toLowerCase() === 'emana';
+      const defaultSong = songUrl || (isEmanaSyneti ? '/Severina - Rodjeno moje.mp3' : '');
+      if (!defaultSong) return;
       const audio = new Audio(defaultSong);
       audio.loop = true;
       audio.volume = 0.4;
