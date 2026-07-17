@@ -47,7 +47,12 @@ export default function CreateInvitation() {
   };
 
   const getDefaultSongName = () => {
-    return 'Pa muzike (default)';
+    const names = {
+      dasem: 'Irma Libohova - Martesa Jonë',
+      kanagjegj: 'Motrat Mustafa - Kanagjegji',
+      syneti: 'Lavdrim Xhelili - Synetia e Djalit',
+    };
+    return names[form.invitationType] || 'Pa muzike (default)';
   };
 
   const togglePreview = () => {

@@ -124,8 +124,12 @@ export default function InvitationView() {
         youTubePlayerRef.current = player;
       });
     } else {
-      const isEmaniSyneti = inv.invitationType === 'syneti' && (inv.groomName?.trim().toLowerCase() === 'eman' || inv.groomName?.trim().toLowerCase() === 'emana');
-      const defaultSong = songUrl || (isEmaniSyneti ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '');
+      const defaultSongs = {
+        dasem: '/Irma Libohova - Martesa Jonë.mp3',
+        kanagjegj: '/Motrat Mustafa - Kanagjegji (2018).mp3',
+        syneti: '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3',
+      };
+      const defaultSong = songUrl || defaultSongs[inv.invitationType] || '';
       if (!defaultSong) return;
       const audio = new Audio(defaultSong);
       audio.loop = true;
@@ -218,8 +222,12 @@ export default function InvitationView() {
         });
         return;
       }
-      const isEmaniSyneti = inv?.invitationType === 'syneti' && (inv?.groomName?.trim().toLowerCase() === 'eman' || inv?.groomName?.trim().toLowerCase() === 'emana');
-      const defaultSong = songUrl || (isEmaniSyneti ? '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3' : '');
+      const defaultSongs = {
+        dasem: '/Irma Libohova - Martesa Jonë.mp3',
+        kanagjegj: '/Motrat Mustafa - Kanagjegji (2018).mp3',
+        syneti: '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3',
+      };
+      const defaultSong = songUrl || (inv ? defaultSongs[inv.invitationType] : '') || '';
       if (!defaultSong) return;
       const audio = new Audio(defaultSong);
       audio.loop = true;
