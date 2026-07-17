@@ -91,9 +91,8 @@ export default function InvitationView() {
     }
   };
 
-  const openInvitation = () => {
-    if (isOpen) return;
-    setIsOpen(true);
+  const startMusic = useCallback(() => {
+    if (!inv || audioRef.current || youTubePlayerRef.current) return;
 
     const songUrl = inv.customMp3Url || '';
     const youtubeId = extractYouTubeId(songUrl);
@@ -101,9 +100,6 @@ export default function InvitationView() {
     if (youtubeId) {
       setIsYouTube(true);
       loadYouTubeAPI().then((YT) => {
-        if (youTubePlayerRef.current) {
-          youTubePlayerRef.current.destroy();
-        }
         const player = new YT.Player('youtube-player', {
           height: '1',
           width: '1',
@@ -135,6 +131,19 @@ export default function InvitationView() {
       audio.play().catch(() => {});
       audioRef.current = audio;
       setIsMusicPlaying(true);
+    }
+  }, [inv, loadYouTubeAPI]);
+
+  useEffect(() => {
+    if (inv) startMusic();
+  }, [inv, startMusic]);
+
+  const openInvitation = () => {
+    if (isOpen) return;
+    setIsOpen(true);
+
+    if (!audioRef.current && !youTubePlayerRef.current) {
+      startMusic();
     }
 
     setTimeout(() => {
@@ -573,7 +582,6 @@ export default function InvitationView() {
       <button
         className={`music-btn${isMusicPlaying ? ' playing' : ''}`}
         onClick={toggleMusic}
-        style={{ display: isOpen ? 'flex' : 'none' }}
       >
         {isMusicPlaying ? '♫' : '♪'}
       </button>
