@@ -70,6 +70,8 @@ export default function CreateInvitation() {
     } else if (musicSource === 'youtube' && form.customMp3Url) {
       window.open(form.customMp3Url, '_blank');
       return;
+    } else if (musicSource === 'local' && form.customMp3Url) {
+      src = form.customMp3Url;
     } else if (musicSource === 'default') {
       src = '';
     }
@@ -99,6 +101,9 @@ export default function CreateInvitation() {
     }
     setMusicSource(source);
     if (source === 'default') {
+      setCustomMp3File(null);
+      setForm(prev => ({ ...prev, customMp3Url: '' }));
+    } else if (source === 'local') {
       setCustomMp3File(null);
       setForm(prev => ({ ...prev, customMp3Url: '' }));
     }
@@ -141,7 +146,7 @@ export default function CreateInvitation() {
           } else {
             fd.append('groomPhone', form[key]);
           }
-        } else if (key === 'customMp3Url' && musicSource !== 'youtube') {
+        } else if (key === 'customMp3Url' && musicSource !== 'youtube' && musicSource !== 'local') {
           return;
         } else {
           fd.append(key, form[key]);
@@ -394,6 +399,13 @@ export default function CreateInvitation() {
                       >
                         <FiYoutube /> YouTube
                       </button>
+                      <button
+                        type="button"
+                        className={`music-source-btn ${musicSource === 'local' ? 'active' : ''}`}
+                        onClick={() => handleMusicSourceChange('local')}
+                      >
+                        🎵 Lokal
+                      </button>
                     </div>
 
                     <div className="music-source-content">
@@ -430,13 +442,23 @@ export default function CreateInvitation() {
                           className="music-youtube-input"
                         />
                       )}
+                      {musicSource === 'local' && (
+                        <input
+                          type="text"
+                          name="customMp3Url"
+                          value={form.customMp3Url}
+                          onChange={handleChange}
+                          placeholder="/Kole Oroshi - Nata e kanes.mp3"
+                          className="music-youtube-input"
+                        />
+                      )}
                     </div>
 
                     <button
                       type="button"
                       className="music-preview-btn"
                       onClick={togglePreview}
-                      disabled={musicSource === 'default' && false || (musicSource === 'upload' && !customMp3File) || (musicSource === 'youtube' && !form.customMp3Url)}
+                      disabled={musicSource === 'default' && false || (musicSource === 'upload' && !customMp3File) || (musicSource === 'youtube' && !form.customMp3Url) || (musicSource === 'local' && !form.customMp3Url)}
                     >
                       {isPreviewPlaying ? <><FiPause /> Ndalo</> : <><FiPlay /> Dëgjo</>}
                     </button>
