@@ -33,6 +33,7 @@ export default function CreateInvitation() {
     customFont: 'Georgia',
     customMp3Url: '',
     language: 'sq',
+    gender: 'male',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
@@ -289,10 +290,27 @@ export default function CreateInvitation() {
               <div className="create-form">
                 <div className="form-row">
                   {form.invitationType === 'syneti' || form.invitationType === 'birthday' ? (
-                    <div className="form-group">
-                      <label>{form.invitationType === 'birthday' ? 'Emri i Personit' : 'Emri i Djalit'}</label>
-                      <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required placeholder={form.invitationType === 'birthday' ? 'Shkruaj emrin e personit' : 'Shkruaj emrin e djalit'} />
-                    </div>
+                    <>
+                      <div className="form-group">
+                        <label>{form.invitationType === 'birthday' ? 'Emri i Personit' : 'Emri i Djalit'}</label>
+                        <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required placeholder={form.invitationType === 'birthday' ? 'Shkruaj emrin e personit' : 'Shkruaj emrin e djalit'} />
+                      </div>
+                      {form.invitationType === 'birthday' && (
+                        <div className="form-group">
+                          <label>Gjinia</label>
+                          <div className="gender-select">
+                            <label className={`gender-option ${form.gender === 'male' ? 'selected' : ''}`}>
+                              <input type="radio" name="gender" value="male" checked={form.gender === 'male'} onChange={handleChange} />
+                              <span>Mashkull</span>
+                            </label>
+                            <label className={`gender-option ${form.gender === 'female' ? 'selected' : ''}`}>
+                              <input type="radio" name="gender" value="female" checked={form.gender === 'female'} onChange={handleChange} />
+                              <span>Femër</span>
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <>
                       {form.invitationType !== 'kanagjegj' && (

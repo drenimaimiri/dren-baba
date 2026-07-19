@@ -117,7 +117,7 @@ export default function InvitationView() {
         dasem: '/Irma Libohova - Martesa Jonë.mp3',
         kanagjegj: '/Motrat Mustafa - Kanagjegji (2018).mp3',
         syneti: '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3',
-        birthday: '/Dafina Zeqiri - Happy Birthday.mp3',
+        birthday: '/Dafina Zeqiri - HAPPY BIRTHDAY.mp3',
       };
       const defaultSong = songUrl || defaultSongs[inv.invitationType] || '';
       if (!defaultSong) return;
@@ -179,7 +179,7 @@ export default function InvitationView() {
         });
         return;
       }
-      const defaultSongs = { dasem: '/Irma Libohova - Martesa Jonë.mp3', kanagjegj: '/Motrat Mustafa - Kanagjegji (2018).mp3', syneti: '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3', birthday: '/Dafina Zeqiri - Happy Birthday.mp3' };
+      const defaultSongs = { dasem: '/Irma Libohova - Martesa Jonë.mp3', kanagjegj: '/Motrat Mustafa - Kanagjegji (2018).mp3', syneti: '/Lavdrim Xhelili - SYNETIA E DJALIT.mp3', birthday: '/Dafina Zeqiri - HAPPY BIRTHDAY.mp3' };
       const defaultSong = songUrl || (inv ? defaultSongs[inv.invitationType] : '') || '';
       if (!defaultSong) return;
       const audio = new Audio(defaultSong);
@@ -236,7 +236,7 @@ export default function InvitationView() {
     switch (inv.invitationType) {
       case 'kanagjegj': return t('invitation.subtitleKanagjegj');
       case 'syneti': return t('invitation.subtitleSynet');
-      case 'birthday': return t('invitation.subtitleBirthday');
+      case 'birthday': return inv.gender === 'female' ? t('invitation.subtitleBirthdayFemale') : t('invitation.subtitleBirthdayMale');
       default: return t('invitation.subtitleWedding');
     }
   };
