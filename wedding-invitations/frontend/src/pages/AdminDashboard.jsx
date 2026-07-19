@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiUsers, FiMail, FiGlobe, FiLayout, FiTrash2, FiBarChart2 } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiUsers, FiMail, FiGlobe, FiLayout, FiTrash2, FiBarChart2, FiX } from 'react-icons/fi';
 import { getAdminStats, getAdminUsers, deleteUser, getAllInvitations, getTemplates } from '../api';
 import './AdminDashboard.css';
 
@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const [invitations, setInvitations] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [tab, setTab] = useState('overview');
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,12 +36,7 @@ export default function AdminDashboard() {
 
   const handleDeleteUser = async (id) => {
     if (!window.confirm('Delete this user and all their invitations?')) return;
-    try {
-      await deleteUser(id);
-      loadData();
-    } catch (err) {
-      console.error(err);
-    }
+    try { await deleteUser(id); loadData(); } catch (err) { console.error(err); }
   };
 
   if (!stats) return <div className="dashboard-loading">Duke ngarkuar...</div>;
@@ -56,7 +52,6 @@ export default function AdminDashboard() {
           <button className={`admin-tab ${tab === 'overview' ? 'active' : ''}`} onClick={() => setTab('overview')}>Përmbledhje</button>
           <button className={`admin-tab ${tab === 'users' ? 'active' : ''}`} onClick={() => setTab('users')}>Përdoruesit</button>
           <button className={`admin-tab ${tab === 'invitations' ? 'active' : ''}`} onClick={() => setTab('invitations')}>Ftesat</button>
-          <button className={`admin-tab ${tab === 'templates' ? 'active' : ''}`} onClick={() => setTab('templates')}>Template-t</button>
         </div>
 
         {tab === 'overview' && (
@@ -68,13 +63,7 @@ export default function AdminDashboard() {
                 { icon: <FiGlobe />, label: 'Të Publikuara', value: stats.publishedInvitations, color: '#ff9800' },
                 { icon: <FiLayout />, label: 'Template-t', value: stats.totalTemplates, color: '#9c27b0' }
               ].map((s, i) => (
-                <motion.div
-                  key={i}
-                  className="stat-card"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
+                <motion.div key={i} className="stat-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <div className="stat-icon" style={{ background: s.color + '20', color: s.color }}>{s.icon}</div>
                   <div className="stat-info">
                     <h3>{s.value}</h3>
@@ -83,7 +72,6 @@ export default function AdminDashboard() {
                 </motion.div>
               ))}
             </div>
-
             <div className="admin-recent">
               <h3>Përdoruesit e Fundit</h3>
               <div className="admin-list">
@@ -151,9 +139,9 @@ export default function AdminDashboard() {
               <tbody>
                 {invitations.map(inv => (
                   <tr key={inv._id}>
-                    <td><strong>{inv.invitationType === 'kanagjegj' ? inv.brideName : inv.invitationType === 'syneti' ? inv.groomName : `${inv.groomName} & ${inv.brideName}`}</strong></td>
+                    <td><strong>{inv.invitationType === 'kanagjegj' ? inv.brideName : inv.invitationType === 'syneti' || inv.invitationType === 'birthday' ? inv.groomName : `${inv.groomName} & ${inv.brideName}`}</strong></td>
                     <td>{inv.user?.name || 'N/A'}</td>
-                    <td><span className="admin-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : inv.invitationType === 'syneti' ? '#10B981' : '#D4AF37' }}>{inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : inv.invitationType === 'syneti' ? 'Synet' : 'Dasëm'}</span></td>
+                    <td><span className="admin-type-badge" style={{ background: inv.invitationType === 'kanagjegj' ? '#8B5CF6' : inv.invitationType === 'syneti' ? '#10B981' : inv.invitationType === 'birthday' ? '#FF6B9D' : '#D4AF37' }}>{inv.invitationType === 'kanagjegj' ? 'Kanagjegj' : inv.invitationType === 'syneti' ? 'Synet' : inv.invitationType === 'birthday' ? 'Ditëlindje' : 'Dasëm'}</span></td>
                     <td>{new Date(inv.weddingDate).toLocaleDateString('sq-AL')}</td>
                     <td><span className={`status-badge ${inv.isPublished ? 'published' : 'draft'}`}>{inv.isPublished ? 'Publik' : 'Draft'}</span></td>
                     <td>{inv.rsvpList?.length || 0}</td>
@@ -161,21 +149,6 @@ export default function AdminDashboard() {
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {tab === 'templates' && (
-          <div className="admin-templates-grid">
-            {templates.map(t => (
-              <div key={t._id} className="admin-template-card" style={{ borderTop: `4px solid ${t.primaryColor}` }}>
-                <h4>{t.name}</h4>
-                <p>{t.description}</p>
-                <div className="admin-template-meta">
-                  <span style={{ background: t.primaryColor + '20', color: t.primaryColor }}>{t.style}</span>
-                  <span style={{ fontFamily: t.font }}>{t.font}</span>
-                </div>
-              </div>
-            ))}
           </div>
         )}
       </div>

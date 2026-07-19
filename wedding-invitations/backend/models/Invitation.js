@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const invitationSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   template: { type: mongoose.Schema.Types.ObjectId, ref: 'Template', required: true },
-  groomName: { type: String, default: '', required: function() { return this.invitationType === 'dasem' || this.invitationType === 'syneti'; } },
-  brideName: { type: String, default: '', required: function() { return this.invitationType !== 'syneti'; } },
+  groomName: { type: String, default: '', required: function() { return this.invitationType === 'dasem' || this.invitationType === 'syneti' || this.invitationType === 'birthday'; } },
+  brideName: { type: String, default: '', required: function() { return this.invitationType === 'dasem' || this.invitationType === 'kanagjegj'; } },
   weddingDate: { type: Date, required: true },
   weddingTime: { type: String, required: true },
   location: { type: String, required: true },
@@ -18,7 +18,7 @@ const invitationSchema = new mongoose.Schema({
   customSecondaryColor: { type: String, default: '#FFF8E7' },
   customFont: { type: String, default: 'Georgia' },
   customMp3Url: { type: String, default: '' },
-  invitationType: { type: String, enum: ['dasem', 'kanagjegj', 'syneti'], default: 'dasem' },
+  invitationType: { type: String, enum: ['dasem', 'kanagjegj', 'syneti', 'birthday'], default: 'dasem' },
   language: { type: String, enum: ['sq', 'en', 'sr'], default: 'sq' },
   slug: { type: String, unique: true },
   isPublished: { type: Boolean, default: false },
@@ -36,8 +36,8 @@ invitationSchema.pre('save', function (next) {
   if (!this.slug) {
     const random = Math.random().toString(36).substring(2, 8);
     let namePart;
-    if (this.invitationType === 'syneti') {
-      namePart = this.groomName || 'syneti';
+    if (this.invitationType === 'syneti' || this.invitationType === 'birthday') {
+      namePart = this.groomName || this.invitationType;
     } else {
       namePart = this.groomName ? `${this.groomName}-${this.brideName}` : this.brideName;
     }

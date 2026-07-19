@@ -47,7 +47,7 @@ export default function EditInvitation() {
         invitationType: inv.invitationType || 'dasem',
         groomName: inv.groomName,
         brideName: inv.brideName,
-        phone: inv.invitationType === 'syneti' ? (inv.groomPhone || '') : inv.invitationType === 'kanagjegj' ? (inv.bridePhone || '') : (inv.groomPhone || ''),
+        phone: inv.invitationType === 'kanagjegj' ? (inv.bridePhone || '') : (inv.groomPhone || ''),
         weddingDate: inv.weddingDate?.split('T')[0] || '',
         weddingTime: inv.weddingTime,
         location: inv.location,
@@ -135,14 +135,12 @@ export default function EditInvitation() {
     try {
       const fd = new FormData();
       Object.keys(form).forEach(key => {
-        if (key === 'phone') {
-          if (form.invitationType === 'kanagjegj') {
-            fd.append('bridePhone', form[key]);
-          } else if (form.invitationType === 'syneti') {
-            fd.append('groomPhone', form[key]);
-          } else {
-            fd.append('groomPhone', form[key]);
-          }
+          if (key === 'phone') {
+            if (form.invitationType === 'kanagjegj') {
+              fd.append('bridePhone', form[key]);
+            } else {
+              fd.append('groomPhone', form[key]);
+            }
         } else if (key === 'customMp3Url' && musicSource !== 'youtube' && musicSource !== 'local') {
           return;
         } else {
@@ -181,12 +179,12 @@ export default function EditInvitation() {
       <div className="container">
         <div className="create-header">
           <h1>Ndrysho Ftesën</h1>
-          <p>{invitation.invitationType === 'kanagjegj' ? invitation.brideName : invitation.invitationType === 'syneti' ? invitation.groomName : `${invitation.groomName} & ${invitation.brideName}`}</p>
+           <p>{invitation.invitationType === 'kanagjegj' ? invitation.brideName : invitation.invitationType === 'syneti' || invitation.invitationType === 'birthday' ? invitation.groomName : `${invitation.groomName} & ${invitation.brideName}`}</p>
         </div>
 
         <form onSubmit={handleSubmit}>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <h2 className="step-title">{form.invitationType === 'kanagjegj' ? 'Detajet e Kanagjegjit' : form.invitationType === 'syneti' ? 'Detajet e Synetit' : 'Detajet e Dasmës'}</h2>
+            <h2 className="step-title">{form.invitationType === 'kanagjegj' ? 'Detajet e Kanagjegjit' : form.invitationType === 'syneti' ? 'Detajet e Synetit' : form.invitationType === 'birthday' ? 'Detajet e Ditëlindjes' : 'Detajet e Dasmës'}</h2>
             <div className="create-form">
               <div className="form-group">
                 <label>Lloji i Ftesës</label>
@@ -208,19 +206,27 @@ export default function EditInvitation() {
                     <h3 style={{ fontSize: '1rem' }}>Kanagjegj</h3>
                   </div>
                   <div
-                    className={`type-select-card ${form.invitationType === 'syneti' ? 'selected' : ''}`}
-                    onClick={() => setForm(prev => ({ ...prev, invitationType: 'syneti' }))}
-                    style={{ padding: '16px 20px' }}
-                  >
-                    <div className="type-select-icon" style={{ fontSize: '1.6rem', marginBottom: 6 }}>✨</div>
-                    <h3 style={{ fontSize: '1rem' }}>Synet</h3>
-                  </div>
+                  className={`type-select-card ${form.invitationType === 'syneti' ? 'selected' : ''}`}
+                  onClick={() => setForm(prev => ({ ...prev, invitationType: 'syneti' }))}
+                  style={{ padding: '16px 20px' }}
+                >
+                  <div className="type-select-icon" style={{ fontSize: '1.6rem', marginBottom: 6 }}>✨</div>
+                  <h3 style={{ fontSize: '1rem' }}>Synet</h3>
+                </div>
+                <div
+                  className={`type-select-card ${form.invitationType === 'birthday' ? 'selected' : ''}`}
+                  onClick={() => setForm(prev => ({ ...prev, invitationType: 'birthday' }))}
+                  style={{ padding: '16px 20px' }}
+                >
+                  <div className="type-select-icon" style={{ fontSize: '1.6rem', marginBottom: 6 }}>🎂</div>
+                  <h3 style={{ fontSize: '1rem' }}>Ditëlindje</h3>
+                </div>
                 </div>
               </div>
               <div className="form-row">
-                {form.invitationType === 'syneti' ? (
+                {form.invitationType === 'syneti' || form.invitationType === 'birthday' ? (
                   <div className="form-group">
-                    <label>Emri i Djalit</label>
+                    <label>{form.invitationType === 'birthday' ? 'Emri i Personit' : 'Emri i Djalit'}</label>
                     <input type="text" name="groomName" value={form.groomName} onChange={handleChange} required />
                   </div>
                 ) : (
@@ -240,7 +246,7 @@ export default function EditInvitation() {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>{form.invitationType === 'kanagjegj' ? 'Data e Kanagjegjit' : form.invitationType === 'syneti' ? 'Data e Synetit' : 'Data e Dasmës'}</label>
+                  <label>{form.invitationType === 'kanagjegj' ? 'Data e Kanagjegjit' : form.invitationType === 'syneti' ? 'Data e Synetit' : form.invitationType === 'birthday' ? 'Data e Ditëlindjes' : 'Data e Dasmës'}</label>
                   <input type="date" name="weddingDate" value={form.weddingDate} onChange={handleChange} required />
                 </div>
                 <div className="form-group">
@@ -303,6 +309,14 @@ export default function EditInvitation() {
                       <option value="Playfair Display">Playfair Display</option>
                       <option value="Great Vibes">Great Vibes</option>
                       <option value="Lora">Lora</option>
+                      <option value="Cormorant Garamond">Cormorant Garamond</option>
+                      <option value="Parisienne">Parisienne</option>
+                      <option value="Tangerine">Tangerine</option>
+                      <option value="Cinzel">Cinzel</option>
+                      <option value="Bodoni Moda">Bodoni Moda</option>
+                      <option value="Mr De Haviland">Mr De Haviland</option>
+                      <option value="Petit Formal Script">Petit Formal Script</option>
+                      <option value="Cormorant Infant">Cormorant Infant</option>
                     </select>
                   </div>
                   <div className="form-group">
@@ -403,7 +417,7 @@ export default function EditInvitation() {
                   <div className="preview-couple">
                     {form.invitationType === 'kanagjegj' ? (
                       <span>{form.brideName}</span>
-                    ) : form.invitationType === 'syneti' ? (
+                    ) : form.invitationType === 'syneti' || form.invitationType === 'birthday' ? (
                       <span>{form.groomName}</span>
                     ) : (
                       <><span>{form.groomName}</span>

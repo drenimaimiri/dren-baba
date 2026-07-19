@@ -5,40 +5,40 @@ const User = require('./models/User');
 
 const templates = [
   {
-    name: 'Classic Elegance',
-    description: 'Një dizajn klasik dhe elegant me ngjyra ari dhe të bardha',
-    primaryColor: '#D4AF37',
-    secondaryColor: '#FFF8E7',
-    font: 'Georgia',
-    style: 'classic',
-    thumbnail: '/templates/classic.jpg'
-  },
-  {
-    name: 'Modern Romance',
-    description: 'Dizajn modern me linja të pastra dhe romantike',
-    primaryColor: '#C9A96E',
-    secondaryColor: '#FAF5EF',
-    font: 'Playfair Display',
-    style: 'modern',
-    thumbnail: '/templates/modern.jpg'
-  },
-  {
     name: 'Romantic Blush',
-    description: 'Stil romantik me nuanca rozë dhe të arta',
-    primaryColor: '#D4AF37',
-    secondaryColor: '#FDE8E8',
-    font: 'Great Vibes',
+    description: 'Nuanca të buta rozë për një atmosferë romantike',
+    primaryColor: '#E8A87C',
+    secondaryColor: '#FFF5F0',
+    font: 'Parisienne',
     style: 'romantic',
-    thumbnail: '/templates/romantic.jpg'
+    thumbnail: '/templates/romantic-blush.jpg'
   },
   {
     name: 'Minimal Luxe',
-    description: 'Minimalizëm luksoz për çifte moderne',
-    primaryColor: '#B8860B',
-    secondaryColor: '#F5F5DC',
+    description: 'Elegancë minimaliste me prekje luksi',
+    primaryColor: '#C4956A',
+    secondaryColor: '#FAFAF7',
     font: 'Lora',
     style: 'minimal',
-    thumbnail: '/templates/minimal.jpg'
+    thumbnail: '/templates/minimal-luxe.jpg'
+  },
+  {
+    name: 'Classic Elegance',
+    description: 'Stil klasik dhe i përjetshëm për çdo rast',
+    primaryColor: '#D4AF37',
+    secondaryColor: '#FFF8E7',
+    font: 'Playfair Display',
+    style: 'classic',
+    thumbnail: '/templates/classic-elegance.jpg'
+  },
+  {
+    name: 'Modern Romance',
+    description: 'Dizajn modern për çifte bashkëkohore',
+    primaryColor: '#B8976A',
+    secondaryColor: '#FDF8F3',
+    font: 'Cinzel',
+    style: 'modern',
+    thumbnail: '/templates/modern-romance.jpg'
   }
 ];
 
